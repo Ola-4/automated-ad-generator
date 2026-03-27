@@ -14,7 +14,7 @@ body {
 }
 
 .page {
-  max-width: 1320px;
+  max-width: 1440px;
   margin: auto;
   padding: 28px 18px;
 }
@@ -63,7 +63,7 @@ body {
 
 .container {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 400px 1fr;
   gap: 24px;
 }
 
@@ -137,21 +137,19 @@ select {
   background-size: 16px;
 }
 
-select:hover {
-  border-color: #7c3aed;
-}
-
 select option {
   background: #1e293b;
   color: white;
 }
 
-input#url {
+input#url,
+textarea#seedKeywords,
+textarea#audience {
   border: 1px solid #06b6d4;
 }
 
 textarea {
-  min-height: 90px;
+  min-height: 100px;
   resize: vertical;
 }
 
@@ -257,6 +255,7 @@ button:hover {
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   animation: fadeUp 0.35s ease;
+  line-height: 1.6;
 }
 
 .tags {
