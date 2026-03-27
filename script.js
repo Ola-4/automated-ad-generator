@@ -66,7 +66,6 @@ function localizeIndustry(industry, language) {
 
 function localizePlatform(platformType, language) {
   const map = {
-    "Portal": { ar: "منصة", en: "platform" },
     "Website": { ar: "موقع", en: "website" },
     "Mobile App": { ar: "تطبيق", en: "app" },
     "SaaS Platform": { ar: "منصة رقمية", en: "digital platform" },
