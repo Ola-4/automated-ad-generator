@@ -12,21 +12,27 @@
       <div>
         <p class="mini-label">AI Marketing Tool</p>
         <h1>AI Marketing Assistant</h1>
-        <p class="hero-text">Generate slogans, headlines, descriptions, CTA, SEO keywords, and content ideas</p>
+        <p class="hero-text">
+          Generate slogans, headlines, descriptions, CTA, SEO keywords, and content ideas
+        </p>
       </div>
       <div class="hero-badge">Clean • Simple • Working</div>
     </header>
 
     <main class="container">
       <section class="inputs card-panel">
-        <label for="Location">Location/label>
-           <option value="en">Sudan</option>
-          <option value="ar">KSA</option>
-          <option value="ar">UAE</option>
-            </select>
+        <div class="section-head">
           <h2>Inputs</h2>
           <span>المدخلات</span>
         </div>
+
+        <label for="locationPreset">Location</label>
+        <select id="locationPreset">
+          <option value="">Select</option>
+          <option value="Sudan">Sudan</option>
+          <option value="KSA">KSA</option>
+          <option value="UAE">UAE</option>
+        </select>
 
         <label for="language">Language</label>
         <select id="language">
@@ -52,10 +58,18 @@
         </select>
 
         <label for="service">Service / Product</label>
-        <input id="service" type="text" placeholder="Example: podcast platform / beauty portal / kids content platform" />
+        <input
+          id="service"
+          type="text"
+          placeholder="Example: podcast platform / beauty portal / kids content platform"
+        />
 
         <label for="location">Target Location</label>
-        <input id="location" type="text" placeholder="Example: UAE / KSA / Sudan / Egypt / Arabic audience" />
+        <input
+          id="location"
+          type="text"
+          placeholder="Example: UAE / KSA / Sudan / Egypt / Arabic audience"
+        />
 
         <label for="industry">Industry</label>
         <select id="industry">
@@ -75,10 +89,16 @@
         </select>
 
         <label for="audience">Target Audience / الفئة المستهدفة (Detailed)</label>
-        <textarea id="audience" placeholder="Example: people who love listening while commuting, homemakers, older audiences"></textarea>
+        <textarea
+          id="audience"
+          placeholder="Example: people who love listening while commuting, homemakers, older audiences"
+        ></textarea>
 
         <label for="seedKeywords">Seed Keywords / الكلمات المفتاحية الأساسية</label>
-        <textarea id="seedKeywords" placeholder="Example: podcast, stories, inspiring stories, audio content, culture"></textarea>
+        <textarea
+          id="seedKeywords"
+          placeholder="Example: podcast, stories, inspiring stories, audio content, culture"
+        ></textarea>
 
         <div class="button-row">
           <button class="primary-btn" onclick="generateResults()">✨ Generate</button>
@@ -111,6 +131,7 @@
           <div class="card-top">
             <h3>🔎 SEO Keywords</h3>
           </div>
+
           <div class="result-section">
             <div class="result-header">
               <h4>Primary Keywords</h4>
@@ -145,6 +166,7 @@
           <div class="card-top">
             <h3>📣 Ad Headlines</h3>
           </div>
+
           <div class="result-section">
             <div class="result-header">
               <h4>10 Short Headlines</h4>
