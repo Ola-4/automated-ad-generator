@@ -1,104 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<title>AI Marketing Dashboard</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Marketing Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="mini-label">AI Marketing Tool</p>
+        <h1>AI Marketing Dashboard</h1>
+        <p class="hero-text">Generate ad copy, SEO keywords, and CTA ideas in seconds</p>
+      </div>
+      <div class="hero-badge">Smart • Fast • Clean</div>
+    </header>
 
-<div class="page">
+    <main class="container">
+      <section class="inputs card-panel">
+        <div class="section-head">
+          <h2>Inputs</h2>
+          <span>المدخلات</span>
+        </div>
 
-<header>
-<h1>AI Marketing Dashboard</h1>
-<p>Create ads, SEO keywords and CTAs instantly</p>
-</header>
+        <label for="projectName">Project Name</label>
+        <input id="projectName" type="text" placeholder="Example: Nova Launch" />
 
-<div class="container">
+        <label for="service">Service / Product</label>
+        <select id="service">
+          <option value="">Select</option>
+          <option>Digital Marketing</option>
+          <option>SaaS Platform</option>
+          <option>Ecommerce Store</option>
+          <option>Training Program</option>
+          <option>Consulting Service</option>
+        </select>
 
-<!-- LEFT SIDE -->
-<div class="inputs">
+        <label for="location">Target Location</label>
+        <input id="location" type="text" placeholder="Example: Dubai" />
 
-<h2>The Inputs</h2>
+        <label for="industry">Industry</label>
+        <select id="industry">
+          <option value="">Select</option>
+          <option>Technology</option>
+          <option>Education</option>
+          <option>Retail</option>
+          <option>Healthcare</option>
+          <option>Finance</option>
+          <option>Marketing</option>
+        </select>
 
-<label>Project Name</label>
-<input id="projectName" type="text" placeholder="Example: Nova Launch">
+        <label for="audience">Target Audience</label>
+        <textarea id="audience" placeholder="Example: young entrepreneurs"></textarea>
 
-<label>Service / Product</label>
-<select id="service">
-<option value="">Select</option>
-<option>Digital Marketing</option>
-<option>SaaS Platform</option>
-<option>Ecommerce Store</option>
-<option>Training Program</option>
-</select>
+        <div class="button-row">
+          <button class="primary-btn" onclick="generateResults()">✨ Generate</button>
+          <button class="secondary-btn" onclick="resetResults()">↺ Reset</button>
+        </div>
+      </section>
 
-<label>Target Location</label>
-<input id="location" type="text" placeholder="Example: Dubai">
+      <section class="outputs">
+        <div class="stats">
+          <div class="stat-box">
+            <span>Project</span>
+            <strong id="statProject">—</strong>
+          </div>
+          <div class="stat-box">
+            <span>Industry</span>
+            <strong id="statIndustry">—</strong>
+          </div>
+          <div class="stat-box">
+            <span>Location</span>
+            <strong id="statLocation">—</strong>
+          </div>
+        </div>
 
-<label>Industry</label>
-<select id="industry">
-<option value="">Select</option>
-<option>Technology</option>
-<option>Education</option>
-<option>Retail</option>
-<option>Healthcare</option>
-<option>Finance</option>
-</select>
+        <div id="loader" class="loader hidden">
+          <div class="spinner"></div>
+          <p>Generating smart marketing ideas...</p>
+        </div>
 
-<label>Target Audience</label>
-<textarea id="audience" placeholder="Example: young entrepreneurs"></textarea>
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>📣 Ad Copy</h3>
+          </div>
 
-<button onclick="generateResults()">Generate Results</button>
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Short Headlines</h4>
+              <button class="copy-btn" onclick="copyContent('shortHeadlines')">Copy</button>
+            </div>
+            <div id="shortHeadlines" class="result-list"></div>
+          </div>
 
-</div>
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Long Headlines</h4>
+              <button class="copy-btn" onclick="copyContent('longHeadlines')">Copy</button>
+            </div>
+            <div id="longHeadlines" class="result-list"></div>
+          </div>
+        </div>
 
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>🔎 SEO Hub</h3>
+          </div>
 
-<!-- RIGHT SIDE -->
-<div class="outputs">
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Primary Keywords</h4>
+              <button class="copy-btn" onclick="copyContent('primaryKeywords')">Copy</button>
+            </div>
+            <div id="primaryKeywords" class="tags"></div>
+          </div>
 
-<div class="card">
+          <div class="result-section">
+            <div class="result-header">
+              <h4>LSI Keywords</h4>
+              <button class="copy-btn" onclick="copyContent('lsiKeywords')">Copy</button>
+            </div>
+            <div id="lsiKeywords" class="tags"></div>
+          </div>
+        </div>
 
-<h3>Ad Copy</h3>
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>🚀 CTA Magic</h3>
+          </div>
 
-<h4>Short Headlines</h4>
-<div id="shortHeadlines"></div>
+          <div class="result-section">
+            <div class="result-header">
+              <h4>CTA Suggestions</h4>
+              <button class="copy-btn" onclick="copyContent('ctaButtons')">Copy</button>
+            </div>
+            <div id="ctaButtons" class="cta-row"></div>
+          </div>
+        </div>
 
-<h4>Long Headlines</h4>
-<div id="longHeadlines"></div>
+        <div id="toast" class="toast">Copied successfully</div>
+      </section>
+    </main>
+  </div>
 
-</div>
-
-
-<div class="card">
-
-<h3>SEO Hub</h3>
-
-<h4>Primary Keywords</h4>
-<div id="primaryKeywords"></div>
-
-<h4>LSI Keywords</h4>
-<div id="lsiKeywords"></div>
-
-</div>
-
-
-<div class="card">
-
-<h3>CTA Magic</h3>
-<div id="ctaButtons"></div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
