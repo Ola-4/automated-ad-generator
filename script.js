@@ -1,7 +1,3 @@
-/* =========================
-   UI HELPERS
-========================= */
-
 function showLoader() {
   document.getElementById("loader").classList.remove("hidden");
 }
@@ -32,9 +28,6 @@ function updateDirection(language) {
   }
 }
 
-/* =========================
-   UTILITIES
-========================= */
 
 function extractDomain(url) {
   try {
@@ -55,10 +48,6 @@ function parseSeedKeywords(seedText) {
 function uniqueList(items) {
   return [...new Set(items.filter(Boolean))];
 }
-
-/* =========================
-   LOCALIZATION
-========================= */
 
 function localizeIndustry(industry, language) {
   const map = {
@@ -99,9 +88,6 @@ function localizePlatform(platformType, language) {
   return map[platformType][language];
 }
 
-/* =========================
-   AUDIENCE DETECTION
-========================= */
 
 function detectAudienceSignals(audience, language) {
 
@@ -147,9 +133,6 @@ function detectAudienceSignals(audience, language) {
   return uniqueList(signals);
 }
 
-/* =========================
-   AUDIENCE HOOKS
-========================= */
 
 function buildAudienceHooks(signals, language) {
 
@@ -182,9 +165,6 @@ function buildAudienceHooks(signals, language) {
   return uniqueList(hooks);
 }
 
-/* =========================
-   SEO KEYWORDS
-========================= */
 
 function makeSeoKeywords(
   language,
@@ -252,9 +232,6 @@ function makeSeoKeywords(
   };
 }
 
-/* =========================
-   GENERATOR ENGINE
-========================= */
 
 function generateResults() {
 
@@ -278,8 +255,8 @@ function generateResults() {
     const service =
       document.getElementById("service").value.trim();
 
-    const location =
-      document.getElementById("location").value.trim();
+   const location =
+document.getElementById("location").value;
 
     const industry =
       document.getElementById("industry").value.trim();
