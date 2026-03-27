@@ -223,58 +223,6 @@ function makeSeoKeywords(language, project, service, localizedIndustry, platform
   };
 }
 
-function buildBrandMessage(language, project, platformLabel, localizedIndustry, audience, hooks, domain) {
-  const name = domain || project || (language === "ar" ? "مشروعك" : "Your Project");
-  const lines = [];
-
-  if (language === "ar") {
-    lines.push(`${name} ${platformLabel} يقدم محتوى في ${localizedIndustry} برسالة أقرب للجمهور.`);
-    if (audience) lines.push(`موجه إلى ${audience}.`);
-    if (hooks.length) {
-      lines.push(...hooks.slice(0, 2));
-    } else {
-      lines.push("محتوى مفيد، قريب، وسهل الارتباط به.");
-    }
-    return uniqueList(lines);
-  }
-
-  lines.push(`${name} is a ${platformLabel} focused on ${localizedIndustry} with a message that feels closer to the audience.`);
-  if (audience) lines.push(`Built for ${audience}.`);
-  if (hooks.length) {
-    lines.push(...hooks.slice(0, 2));
-  } else {
-    lines.push("Useful, relevant content with stronger audience connection.");
-  }
-  return uniqueList(lines);
-}
-
-function buildSeoTitle(language, project, localizedIndustry, seeds, domain) {
-  const name = domain || project || (language === "ar" ? "مشروعك" : "Your Project");
-  const seed = seeds[0] || "";
-
-  if (language === "ar") {
-    return seed
-      ? `${name} | ${seed} | ${localizedIndustry}`
-      : `${name} | ${localizedIndustry} | محتوى مفيد وملهم`;
-  }
-
-  return seed
-    ? `${name} | ${seed} | ${localizedIndustry}`
-    : `${name} | ${localizedIndustry} | Useful & Inspiring Content`;
-}
-
-function buildMetaDescription(language, project, localizedIndustry, audience, hooks, seeds, location, domain) {
-  const name = domain || project || (language === "ar" ? "مشروعك" : "Your Project");
-  const mainHook = hooks[0] || "";
-  const topSeeds = seeds.slice(0, 4);
-
-  if (language === "ar") {
-    return `${name} منصة في ${localizedIndustry}${audience ? ` موجهة إلى ${audience}` : ""}${location ? ` في ${location}` : ""}${mainHook ? `، ${mainHook}` : ""}${topSeeds.length ? `، مع تركيز على ${topSeeds.join("، ")}` : ""}.`;
-  }
-
-  return `${name} is a ${localizedIndustry} platform${audience ? ` built for ${audience}` : ""}${location ? ` in ${location}` : ""}${mainHook ? `, ${mainHook}` : ""}${topSeeds.length ? `, focused on ${topSeeds.join(", ")}` : ""}.`;
-}
-
 function buildShortHeadlines(language, project, localizedIndustry, hooks, seeds, domain, audience) {
   const name = domain || project || (language === "ar" ? "مشروعك" : "Your Project");
   const seedA = seeds[0] || localizedIndustry;
@@ -525,28 +473,6 @@ function generateResults() {
     const audienceSignals = detectAudienceSignals(audience, language);
     const audienceHooks = buildAudienceHooks(audienceSignals, language);
 
-    const brandMessage = buildBrandMessage(
-      language,
-      project,
-      platformLabel,
-      localizedIndustry,
-      audience,
-      audienceHooks,
-      domain
-    );
-
-    const seoTitle = buildSeoTitle(language, project, localizedIndustry, seeds, domain);
-    const metaDescription = buildMetaDescription(
-      language,
-      project,
-      localizedIndustry,
-      audience,
-      audienceHooks,
-      seeds,
-      location,
-      domain
-    );
-
     const seoKeywords = makeSeoKeywords(
       language,
       project,
@@ -559,57 +485,16 @@ function generateResults() {
       domain
     );
 
-    const shortHeadlines = buildShortHeadlines(
-      language,
-      project,
-      localizedIndustry,
-      audienceHooks,
-      seeds,
-      domain,
-      audience
-    );
-
-    const longHeadlines = buildLongHeadlines(
-      language,
-      project,
-      localizedIndustry,
-      audienceHooks,
-      seeds,
-      domain,
-      location
-    );
-
-    const descriptions = buildDescriptions(
-      language,
-      project,
-      localizedIndustry,
-      audienceHooks,
-      seeds,
-      audience,
-      domain
-    );
-
-    const slogans = buildSlogans(
-      language,
-      project,
-      audienceHooks,
-      localizedIndustry,
-      domain
-    );
-
+    const slogans = buildSlogans(language, project, audienceHooks, localizedIndustry, domain);
+    const shortHeadlines = buildShortHeadlines(language, project, localizedIndustry, audienceHooks, seeds, domain, audience);
+    const longHeadlines = buildLongHeadlines(language, project, localizedIndustry, audienceHooks, seeds, domain, location);
+    const descriptions = buildDescriptions(language, project, localizedIndustry, audienceHooks, seeds, audience, domain);
     const ctas = buildCTAs(language, audienceHooks, localizedIndustry);
     const contentIdeas = buildContentIdeas(language, seeds, audience, audienceHooks, localizedIndustry);
 
     document.getElementById("statProject").textContent = project || "—";
     document.getElementById("statIndustry").textContent = localizedIndustry || "—";
     document.getElementById("statLocation").textContent = location || "—";
-
-    document.getElementById("brandMessage").innerHTML = brandMessage
-      .map(item => `<div class="result-item">${item}</div>`)
-      .join("");
-
-    document.getElementById("seoTitle").innerHTML = `<div class="result-item">${seoTitle}</div>`;
-    document.getElementById("metaDescription").innerHTML = `<div class="result-item">${metaDescription}</div>`;
 
     document.getElementById("primaryKeywords").innerHTML = seoKeywords.primary
       .map(item => `<span class="keyword">${item}</span>`)
@@ -664,9 +549,6 @@ function resetResults() {
   document.getElementById("statIndustry").textContent = "—";
   document.getElementById("statLocation").textContent = "—";
 
-  document.getElementById("brandMessage").innerHTML = `<div class="empty">No brand message yet.</div>`;
-  document.getElementById("seoTitle").innerHTML = `<div class="empty">No SEO title yet.</div>`;
-  document.getElementById("metaDescription").innerHTML = `<div class="empty">No meta description yet.</div>`;
   document.getElementById("primaryKeywords").innerHTML = `<div class="empty">No keywords yet.</div>`;
   document.getElementById("supportingKeywords").innerHTML = `<div class="empty">No supporting keywords yet.</div>`;
   document.getElementById("slogans").innerHTML = `<div class="empty">No slogans yet.</div>`;
