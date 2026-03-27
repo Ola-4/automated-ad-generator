@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Marketing Assistant</title>
-  <link rel="stylesheet" href="style.css?v=20" />
+  <link rel="stylesheet" href="style.css?v=21" />
 </head>
 <body>
   <div class="page">
@@ -26,13 +26,13 @@
           <span>المدخلات</span>
         </div>
 
-        <label for="location">Target Location</label>
-<select id="location">
-  <option value="">Select Location</option>
-  <option value="Sudan">Sudan</option>
-  <option value="KSA">KSA</option>
-  <option value="UAE">UAE</option>
-</select>
+        <label for="locationPreset">Location</label>
+        <select id="locationPreset">
+          <option value="">Select</option>
+          <option value="Sudan">Sudan</option>
+          <option value="KSA">KSA</option>
+          <option value="UAE">UAE</option>
+        </select>
 
         <label for="language">Language</label>
         <select id="language">
@@ -50,25 +50,22 @@
         <select id="platformType">
           <option value="">Select</option>
           <option>Website</option>
-          <option>Mobile App</option>
-          <option>SaaS Platform</option>
-          <option>E-commerce</option>
-          <option>Media Platform</option>
         </select>
 
         <label for="service">Service / Product</label>
         <input
           id="service"
           type="text"
-          placeholder="Example: podcast platform / beauty portal / kids content platform"
+          placeholder="Example: podcast website / beauty website / kids content website"
         />
 
         <label for="location">Target Location</label>
-        <input
-          id="location"
-          type="text"
-          placeholder="Example: UAE / KSA / Sudan / Egypt / Arabic audience"
-        />
+        <select id="location">
+          <option value="">Select Location</option>
+          <option value="Sudan">Sudan</option>
+          <option value="KSA">KSA</option>
+          <option value="UAE">UAE</option>
+        </select>
 
         <label for="industry">Industry</label>
         <select id="industry">
@@ -227,6 +224,6 @@
     </main>
   </div>
 
-  <script src="script.js?v=20"></script>
+  <script src="script.js?v=21"></script>
 </body>
 </html>
