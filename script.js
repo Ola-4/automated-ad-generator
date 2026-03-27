@@ -16,73 +16,151 @@ function showToast(message) {
   }, 1800);
 }
 
-function generateResults() {
-  showLoader();
+function makeSmartKeywords(service, industry, audience, location, language) {
+  const s = service || (language === "ar" ? "الخدمة" : "service");
+  const i = industry || (language === "ar" ? "المجال" : "industry");
+  const a = audience || (language === "ar" ? "العملاء" : "customers");
+  const l = location || "";
 
-  setTimeout(() => {
-    const project = document.getElementById("projectName").value.trim() || "Your Project";
-    const service = document.getElementById("service").value.trim() || "your service";
-    const location = document.getElementById("location").value.trim() || "your market";
-    const industry = document.getElementById("industry").value.trim() || "your industry";
-    const audience = document.getElementById("audience").value.trim() || "your audience";
-
-    const shortHeadlines = [
-      `Boost ${project}`,
-      `Grow with ${service}`,
-      `Reach more clients in ${location}`,
-      `${industry} made simpler`
-    ];
-
-    const longHeadlines = [
-      `Discover how ${service} helps ${audience} achieve faster growth.`,
-      `Scale your ${industry} business in ${location} with smarter marketing.`,
-      `${project} gives you a better way to attract, engage, and convert customers.`
-    ];
-
-    const keywords = [
-      service,
-      `${industry} solutions`,
-      `best ${service}`,
-      `${location} ${industry}`,
-      `${audience} tools`
+  if (language === "ar") {
+    const primary = [
+      `${s}`,
+      `${s} في ${i}`,
+      `${s} لـ ${a}`,
+      `حلول ${i}`,
+      l ? `${s} في ${l}` : `أفضل ${s}`,
+      l ? `${i} في ${l}` : `${i} الرقمي`
     ];
 
     const lsi = [
-      "growth strategy",
-      "customer acquisition",
-      "digital visibility",
-      "brand awareness",
-      "lead generation"
+      `استراتيجيات ${i}`,
+      `تحسين الوصول للعملاء`,
+      `زيادة المبيعات`,
+      `حلول مبتكرة`,
+      `نمو الأعمال`,
+      `تحسين التحويل`,
+      `بناء العلامة التجارية`,
+      `استهداف ${a}`
     ];
 
-    const ctas = [
+    return { primary, lsi };
+  }
+
+  const primary = [
+    `${s}`,
+    `${s} for ${a}`,
+    `${i} solutions`,
+    `best ${s}`,
+    l ? `${s} in ${l}` : `${i} marketing`,
+    `${i} services`
+  ];
+
+  const lsi = [
+    `${i} growth strategy`,
+    `customer acquisition`,
+    `conversion optimization`,
+    `brand awareness`,
+    `lead generation`,
+    `${s} experts`,
+    `${i} digital solutions`,
+    `targeting ${a}`
+  ];
+
+  return { primary, lsi };
+}
+
+function makeAdCopy(project, service, industry, audience, location, language) {
+  if (language === "ar") {
+    return {
+      shortHeadlines: [
+        `طوّر ${project}`,
+        `نمِّ أعمالك مع ${service}`,
+        location ? `وسع وصولك في ${location}` : `وسع وصولك للعملاء`,
+        `${industry} بطريقة أذكى`
+      ],
+      longHeadlines: [
+        `${service} يساعد ${audience} على تحقيق نتائج أفضل ونمو أسرع.`,
+        `ارتقِ في مجال ${industry} بحلول تسويقية أكثر ذكاءً وفعالية.`,
+        `${project} يمنحك طريقة أفضل لجذب العملاء وتحويلهم إلى نتائج حقيقية.`
+      ],
+      ctas: [
+        "ابدأ الآن",
+        "اطلب عرضًا تجريبيًا",
+        "تواصل معنا",
+        "جرّب اليوم"
+      ]
+    };
+  }
+
+  return {
+    shortHeadlines: [
+      `Boost ${project}`,
+      `Grow with ${service}`,
+      location ? `Reach more clients in ${location}` : `Reach more customers`,
+      `${industry} made smarter`
+    ],
+    longHeadlines: [
+      `Discover how ${service} helps ${audience} achieve faster growth.`,
+      `Scale your ${industry} business with smarter, more effective marketing.`,
+      `${project} gives you a better way to attract, engage, and convert customers.`
+    ],
+    ctas: [
       "Get Started",
       "Request Demo",
       "Contact Us",
       "Start Today"
-    ];
+    ]
+  };
+}
+
+function updateDirection(language) {
+  const body = document.body;
+  if (language === "ar") {
+    body.setAttribute("dir", "rtl");
+    body.setAttribute("lang", "ar");
+  } else {
+    body.setAttribute("dir", "ltr");
+    body.setAttribute("lang", "en");
+  }
+}
+
+function generateResults() {
+  showLoader();
+
+  setTimeout(() => {
+    const language = document.getElementById("language").value;
+    const project = document.getElementById("projectName").value.trim() || (language === "ar" ? "مشروعك" : "Your Project");
+    const service = document.getElementById("service").value.trim() || (language === "ar" ? "خدمتك" : "your service");
+    const location = document.getElementById("location").value.trim() || (language === "ar" ? "سوقك" : "your market");
+    const industry = document.getElementById("industry").value.trim() || (language === "ar" ? "مجالك" : "your industry");
+    const audience = document.getElementById("audience").value.trim() || (language === "ar" ? "عملائك" : "your audience");
+
+    updateDirection(language);
+
+    const ads = makeAdCopy(project, service, industry, audience, location, language);
+    const keywordsData = makeSmartKeywords(service, industry, audience, location, language);
 
     document.getElementById("statProject").textContent = project;
     document.getElementById("statIndustry").textContent = industry;
     document.getElementById("statLocation").textContent = location;
 
-    document.getElementById("shortHeadlines").innerHTML = shortHeadlines
+    document.getElementById("shortHeadlines").innerHTML = ads.shortHeadlines
       .map(item => `<div class="result-item">${item}</div>`)
       .join("");
 
-    document.getElementById("longHeadlines").innerHTML = longHeadlines
+    document.getElementById("longHeadlines").innerHTML = ads.longHeadlines
       .map(item => `<div class="result-item">${item}</div>`)
       .join("");
 
-    document.getElementById("primaryKeywords").innerHTML = keywords
+    document.getElementById("primaryKeywords").innerHTML = keywordsData.primary
       .map(item => `<span class="keyword">${item}</span>`)
       .join("");
 
-    document.getElementById("lsiKeywords").innerHTML = lsi
+    document.getElementById("lsiKeywords").innerHTML = keywordsData.lsi
       .map(item => `<span class="keyword">${item}</span>`)
       .join("");
 
-    document.getElementById("ctaButtons").innerHTML = ctas
+    document.getElementById("ctaButtons").innerHTML = ads.ctas
       .map(item => `<span class="cta">${item}</span>`)
       .join("");
 
@@ -96,6 +174,9 @@ function resetResults() {
   document.getElementById("location").value = "";
   document.getElementById("industry").value = "";
   document.getElementById("audience").value = "";
+  document.getElementById("language").value = "en";
+
+  updateDirection("en");
 
   document.getElementById("statProject").textContent = "—";
   document.getElementById("statIndustry").textContent = "—";
