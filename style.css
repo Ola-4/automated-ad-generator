@@ -370,4 +370,38 @@ button:hover {
     flex-direction: column;
     align-items: flex-start;
   }
+  body[dir="rtl"] {
+  text-align: right;
+}
+
+body[dir="rtl"] .section-head,
+body[dir="rtl"] .result-header,
+body[dir="rtl"] .hero,
+body[dir="rtl"] .card-top,
+body[dir="rtl"] .stats {
+  direction: rtl;
+}
+
+body[dir="rtl"] input,
+body[dir="rtl"] textarea,
+body[dir="rtl"] select {
+  text-align: right;
+}
+
+body[dir="rtl"] .hero {
+  flex-direction: row-reverse;
+}
+
+body[dir="rtl"] .section-head {
+  flex-direction: row-reverse;
+}
+
+body[dir="rtl"] .result-header {
+  flex-direction: row-reverse;
+}
+
+body[dir="rtl"] .cta-row,
+body[dir="rtl"] .tags {
+  justify-content: flex-start;
+}
 }
