@@ -6,6 +6,15 @@ function hideLoader() {
   document.getElementById("loader").classList.add("hidden");
 }
 
+function extractDomain(url) {
+  try {
+    const u = new URL(url);
+    return u.hostname.replace("www.", "");
+  } catch {
+    return "";
+  }
+}
+
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
@@ -16,15 +25,16 @@ function showToast(message) {
   }, 1800);
 }
 
-function makeSmartKeywords(service, industry, audience, location, language) {
+function makeSmartKeywords(service, industry, audience, location, language, domain) {
   const s = service || (language === "ar" ? "الخدمة" : "service");
   const i = industry || (language === "ar" ? "المجال" : "industry");
   const a = audience || (language === "ar" ? "العملاء" : "customers");
   const l = location || "";
+  const base = domain || s;
 
   if (language === "ar") {
     const primary = [
-      `${s}`,
+      `${base}`,
       `${s} في ${i}`,
       `${s} لـ ${a}`,
       `حلول ${i}`,
@@ -47,11 +57,11 @@ function makeSmartKeywords(service, industry, audience, location, language) {
   }
 
   const primary = [
-    `${s}`,
+    `${base}`,
     `${s} for ${a}`,
     `${i} solutions`,
     `best ${s}`,
-    l ? `${s} in ${l}` : `${i} marketing`,
+    l ? `${s} in ${l}` : `${s} online`,
     `${i} services`
   ];
 
@@ -69,11 +79,11 @@ function makeSmartKeywords(service, industry, audience, location, language) {
   return { primary, lsi };
 }
 
-function makeAdCopy(project, service, industry, audience, location, language) {
+function makeAdCopy(project, service, industry, audience, location, language, domain) {
   if (language === "ar") {
     return {
       shortHeadlines: [
-        `طوّر ${project}`,
+        domain ? `اكتشف ${domain}` : `طوّر ${project}`,
         `نمِّ أعمالك مع ${service}`,
         location ? `وسع وصولك في ${location}` : `وسع وصولك للعملاء`,
         `${industry} بطريقة أذكى`
@@ -94,7 +104,7 @@ function makeAdCopy(project, service, industry, audience, location, language) {
 
   return {
     shortHeadlines: [
-      `Boost ${project}`,
+      domain ? `Discover ${domain}` : `Boost ${project}`,
       `Grow with ${service}`,
       location ? `Reach more clients in ${location}` : `Reach more customers`,
       `${industry} made smarter`
@@ -115,6 +125,7 @@ function makeAdCopy(project, service, industry, audience, location, language) {
 
 function updateDirection(language) {
   const body = document.body;
+
   if (language === "ar") {
     body.setAttribute("dir", "rtl");
     body.setAttribute("lang", "ar");
@@ -129,16 +140,44 @@ function generateResults() {
 
   setTimeout(() => {
     const language = document.getElementById("language").value;
-    const project = document.getElementById("projectName").value.trim() || (language === "ar" ? "مشروعك" : "Your Project");
-    const service = document.getElementById("service").value.trim() || (language === "ar" ? "خدمتك" : "your service");
-    const location = document.getElementById("location").value.trim() || (language === "ar" ? "سوقك" : "your market");
-    const industry = document.getElementById("industry").value.trim() || (language === "ar" ? "مجالك" : "your industry");
-    const audience = document.getElementById("audience").value.trim() || (language === "ar" ? "عملائك" : "your audience");
+    const project =
+      document.getElementById("projectName").value.trim() ||
+      (language === "ar" ? "مشروعك" : "Your Project");
+    const service =
+      document.getElementById("service").value.trim() ||
+      (language === "ar" ? "خدمتك" : "your service");
+    const url = document.getElementById("url").value.trim();
+    const domain = extractDomain(url);
+    const location =
+      document.getElementById("location").value.trim() ||
+      (language === "ar" ? "سوقك" : "your market");
+    const industry =
+      document.getElementById("industry").value.trim() ||
+      (language === "ar" ? "مجالك" : "your industry");
+    const audience =
+      document.getElementById("audience").value.trim() ||
+      (language === "ar" ? "عملائك" : "your audience");
 
     updateDirection(language);
 
-    const ads = makeAdCopy(project, service, industry, audience, location, language);
-    const keywordsData = makeSmartKeywords(service, industry, audience, location, language);
+    const ads = makeAdCopy(
+      project,
+      service,
+      industry,
+      audience,
+      location,
+      language,
+      domain
+    );
+
+    const keywordsData = makeSmartKeywords(
+      service,
+      industry,
+      audience,
+      location,
+      language,
+      domain
+    );
 
     document.getElementById("statProject").textContent = project;
     document.getElementById("statIndustry").textContent = industry;
@@ -171,6 +210,7 @@ function generateResults() {
 function resetResults() {
   document.getElementById("projectName").value = "";
   document.getElementById("service").value = "";
+  document.getElementById("url").value = "";
   document.getElementById("location").value = "";
   document.getElementById("industry").value = "";
   document.getElementById("audience").value = "";
@@ -182,11 +222,16 @@ function resetResults() {
   document.getElementById("statIndustry").textContent = "—";
   document.getElementById("statLocation").textContent = "—";
 
-  document.getElementById("shortHeadlines").innerHTML = `<div class="empty">No headlines yet.</div>`;
-  document.getElementById("longHeadlines").innerHTML = `<div class="empty">No long headlines yet.</div>`;
-  document.getElementById("primaryKeywords").innerHTML = `<div class="empty">No keywords yet.</div>`;
-  document.getElementById("lsiKeywords").innerHTML = `<div class="empty">No LSI keywords yet.</div>`;
-  document.getElementById("ctaButtons").innerHTML = `<div class="empty">No CTA suggestions yet.</div>`;
+  document.getElementById("shortHeadlines").innerHTML =
+    `<div class="empty">No headlines yet.</div>`;
+  document.getElementById("longHeadlines").innerHTML =
+    `<div class="empty">No long headlines yet.</div>`;
+  document.getElementById("primaryKeywords").innerHTML =
+    `<div class="empty">No keywords yet.</div>`;
+  document.getElementById("lsiKeywords").innerHTML =
+    `<div class="empty">No LSI keywords yet.</div>`;
+  document.getElementById("ctaButtons").innerHTML =
+    `<div class="empty">No CTA suggestions yet.</div>`;
 }
 
 function copyContent(elementId) {
