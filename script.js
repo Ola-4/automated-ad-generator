@@ -19,10 +19,7 @@ function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 1800);
+  setTimeout(() => toast.classList.remove("show"), 1800);
 }
 
 function updateDirection(language) {
@@ -67,105 +64,6 @@ function localizeIndustry(industry, language) {
   return language === "ar" ? map[industry].ar : map[industry].en;
 }
 
-function detectAudienceSignals(audience, language) {
-  const text = (audience || "").toLowerCase();
-  const signals = [];
-
-  if (language === "ar") {
-    if (text.includes("مواصلات") || text.includes("الطريق") || text.includes("مشوار")) signals.push("commute");
-    if (text.includes("ربة منزل") || text.includes("ربات المنزل") || text.includes("البيت") || text.includes("المنزل")) signals.push("home");
-    if (text.includes("كبار") || text.includes("الكبار") || text.includes("كبار السن")) signals.push("older");
-    if (text.includes("شباب") || text.includes("طلاب") || text.includes("المراهق")) signals.push("youth");
-    if (text.includes("يسمع") || text.includes("استماع") || text.includes("صوت") || text.includes("يسمعوا")) signals.push("listening");
-    if (text.includes("مشغول") || text.includes("مشغولين") || text.includes("زحمة")) signals.push("busy");
-    if (text.includes("عائلات") || text.includes("أسر")) signals.push("family");
-    if (text.includes("يحب") || text.includes("يحبوا") || text.includes("يفضل")) signals.push("interest");
-  } else {
-    if (text.includes("commute") || text.includes("road") || text.includes("transport") || text.includes("driving")) signals.push("commute");
-    if (text.includes("home") || text.includes("housewives") || text.includes("household")) signals.push("home");
-    if (text.includes("older") || text.includes("elderly") || text.includes("seniors")) signals.push("older");
-    if (text.includes("youth") || text.includes("young") || text.includes("students")) signals.push("youth");
-    if (text.includes("listen") || text.includes("audio") || text.includes("hearing")) signals.push("listening");
-    if (text.includes("busy")) signals.push("busy");
-    if (text.includes("family") || text.includes("families")) signals.push("family");
-    if (text.includes("love") || text.includes("prefer") || text.includes("enjoy")) signals.push("interest");
-  }
-
-  return uniqueList(signals);
-}
-
-function buildAudienceHooks(signals, language) {
-  if (language === "ar") {
-    const hooks = [];
-
-    if (signals.includes("commute")) {
-      hooks.push("استمع واستمتع بالطريق");
-      hooks.push("رفيقك اليومي في المواصلات");
-    }
-    if (signals.includes("home")) {
-      hooks.push("استمع وأنت في البيت");
-      hooks.push("محتوى يرافق يومك في المنزل");
-    }
-    if (signals.includes("older")) {
-      hooks.push("محتوى سهل ومريح للكبار");
-      hooks.push("استماع هادئ يناسب كل الأعمار");
-    }
-    if (signals.includes("busy")) {
-      hooks.push("محتوى يناسب يومك المشغول");
-      hooks.push("استمع في أي وقت بدون تعقيد");
-    }
-    if (signals.includes("listening")) {
-      hooks.push("محتوى صُمم لعشاق الاستماع");
-      hooks.push("استماع ممتع في كل لحظة");
-    }
-    if (signals.includes("family")) {
-      hooks.push("محتوى قريب من العائلة");
-    }
-    if (signals.includes("youth")) {
-      hooks.push("محتوى قريب من الشباب");
-    }
-    if (signals.includes("interest")) {
-      hooks.push("محتوى أقرب لاهتمامات جمهورك");
-    }
-
-    return uniqueList(hooks);
-  }
-
-  const hooks = [];
-
-  if (signals.includes("commute")) {
-    hooks.push("Listen and enjoy the road");
-    hooks.push("Your daily companion on the commute");
-  }
-  if (signals.includes("home")) {
-    hooks.push("Enjoy it while at home");
-    hooks.push("Content that fits your day at home");
-  }
-  if (signals.includes("older")) {
-    hooks.push("Comfortable listening for older audiences");
-    hooks.push("Simple and warm content for every age");
-  }
-  if (signals.includes("busy")) {
-    hooks.push("Content made for busy days");
-    hooks.push("Listen anytime without effort");
-  }
-  if (signals.includes("listening")) {
-    hooks.push("Built for people who love listening");
-    hooks.push("Audio enjoyment in every moment");
-  }
-  if (signals.includes("family")) {
-    hooks.push("Content that fits family life");
-  }
-  if (signals.includes("youth")) {
-    hooks.push("A tone that connects with younger audiences");
-  }
-  if (signals.includes("interest")) {
-    hooks.push("Content built around audience interests");
-  }
-
-  return uniqueList(hooks);
-}
-
 function localizePlatform(platformType, language) {
   const map = {
     "Portal": { ar: "منصة", en: "platform" },
@@ -180,39 +78,71 @@ function localizePlatform(platformType, language) {
   return language === "ar" ? map[platformType].ar : map[platformType].en;
 }
 
+function detectAudienceSignals(audience, language) {
+  const text = (audience || "").toLowerCase();
+  const signals = [];
+
+  if (language === "ar") {
+    if (text.includes("مواصلات") || text.includes("الطريق") || text.includes("مشوار")) signals.push("commute");
+    if (text.includes("ربة منزل") || text.includes("ربات المنزل") || text.includes("البيت") || text.includes("المنزل")) signals.push("home");
+    if (text.includes("كبار") || text.includes("الكبار") || text.includes("كبار السن")) signals.push("older");
+    if (text.includes("شباب") || text.includes("طلاب")) signals.push("youth");
+    if (text.includes("يسمع") || text.includes("استماع") || text.includes("صوت")) signals.push("listening");
+    if (text.includes("مشغول") || text.includes("مشغولين")) signals.push("busy");
+    if (text.includes("عائلات") || text.includes("أسر")) signals.push("family");
+  } else {
+    if (text.includes("commute") || text.includes("road") || text.includes("transport") || text.includes("driving")) signals.push("commute");
+    if (text.includes("home") || text.includes("housewives")) signals.push("home");
+    if (text.includes("older") || text.includes("elderly") || text.includes("seniors")) signals.push("older");
+    if (text.includes("youth") || text.includes("young") || text.includes("students")) signals.push("youth");
+    if (text.includes("listen") || text.includes("audio")) signals.push("listening");
+    if (text.includes("busy")) signals.push("busy");
+    if (text.includes("family") || text.includes("families")) signals.push("family");
+  }
+
+  return uniqueList(signals);
+}
+
+function buildAudienceHooks(signals, language) {
+  if (language === "ar") {
+    const hooks = [];
+    if (signals.includes("commute")) hooks.push("استمع واستمتع بالطريق", "رفيقك اليومي في المواصلات");
+    if (signals.includes("home")) hooks.push("استمع وأنت في البيت", "محتوى يرافق يومك في المنزل");
+    if (signals.includes("older")) hooks.push("محتوى سهل ومريح للكبار", "استماع هادئ يناسب كل الأعمار");
+    if (signals.includes("busy")) hooks.push("محتوى يناسب يومك المشغول", "استمع في أي وقت بدون تعقيد");
+    if (signals.includes("listening")) hooks.push("محتوى صُمم لعشاق الاستماع", "استماع ممتع في كل لحظة");
+    if (signals.includes("family")) hooks.push("محتوى قريب من العائلة");
+    if (signals.includes("youth")) hooks.push("محتوى قريب من الشباب");
+    return uniqueList(hooks);
+  }
+
+  const hooks = [];
+  if (signals.includes("commute")) hooks.push("Listen and enjoy the road", "Your daily companion on the commute");
+  if (signals.includes("home")) hooks.push("Enjoy it while at home", "Content that fits your day at home");
+  if (signals.includes("older")) hooks.push("Comfortable listening for older audiences", "Simple and warm content for every age");
+  if (signals.includes("busy")) hooks.push("Content made for busy days", "Listen anytime without effort");
+  if (signals.includes("listening")) hooks.push("Built for people who love listening", "Audio enjoyment in every moment");
+  if (signals.includes("family")) hooks.push("Content that fits family life");
+  if (signals.includes("youth")) hooks.push("A tone that connects with younger audiences");
+  return uniqueList(hooks);
+}
+
 function makeSeoKeywords(language, project, service, localizedIndustry, platformLabel, seeds, audience, location, domain) {
   const baseName = domain || project || service || localizedIndustry;
   const primary = [];
   const supporting = [];
 
-  primary.push(baseName);
-  primary.push(localizedIndustry);
-  primary.push(service || "");
-  primary.push(`${platformLabel} ${localizedIndustry}`);
+  primary.push(baseName, localizedIndustry, service || "", `${platformLabel} ${localizedIndustry}`);
   if (audience) primary.push(language === "ar" ? `${localizedIndustry} لـ ${audience}` : `${localizedIndustry} for ${audience}`);
   if (location) primary.push(language === "ar" ? `${localizedIndustry} في ${location}` : `${localizedIndustry} in ${location}`);
   primary.push(...seeds);
 
   if (language === "ar") {
-    supporting.push(
-      "تحسين محركات البحث",
-      "ظهور عضوي",
-      `كلمات مفتاحية ${localizedIndustry}`,
-      "نمو العلامة التجارية",
-      "الوصول للجمهور",
-      `محتوى ${localizedIndustry}`
-    );
+    supporting.push("تحسين محركات البحث", "ظهور عضوي", `كلمات مفتاحية ${localizedIndustry}`, "نمو العلامة التجارية", "الوصول للجمهور", `محتوى ${localizedIndustry}`);
     if (audience) supporting.push(`اهتمامات ${audience}`);
     if (location) supporting.push(`${localizedIndustry} ${location}`);
   } else {
-    supporting.push(
-      "search engine optimization",
-      "organic visibility",
-      `${localizedIndustry} keywords`,
-      "brand growth",
-      "audience reach",
-      `${localizedIndustry} content`
-    );
+    supporting.push("search engine optimization", "organic visibility", `${localizedIndustry} keywords`, "brand growth", "audience reach", `${localizedIndustry} content`);
     if (audience) supporting.push(`${audience} interests`);
     if (location) supporting.push(`${localizedIndustry} ${location}`);
   }
@@ -272,11 +202,11 @@ function buildLongHeadlines(language, project, localizedIndustry, hooks, seeds, 
       topSeeds.length ? `استمتع بمحتوى حول ${topSeeds.join("، ")}.` : `محتوى ملهم ومفيد يناسب لحظات يومك المختلفة.`,
       location ? `قدّم حضورًا أقوى في ${location} عبر محتوى ${localizedIndustry}.` : `قدّم محتوى ${localizedIndustry} برسالة أوضح.`,
       `محتوى صُمم ليكون أسهل في الوصول وأقرب للاهتمامات.`,
-      `تجربة محتوى أكثر قربًا، ووضوحًا، وارتباطًا بالحياة اليومية.`,
+      `تجربة محتوى أكثر قربًا ووضوحًا وارتباطًا بالحياة اليومية.`,
       `${name} يجعل ${localizedIndustry} أكثر بساطة وجاذبية.`,
       `رسالة أقوى ومحتوى يعرف كيف يتحدث إلى الجمهور.`,
       `منصة تفهم اهتمامات الجمهور وتحوّلها إلى محتوى أقرب.`,
-      `اكتشف محتوى يرافق يومك في البيت، الطريق، واللحظات الهادئة.`
+      `اكتشف محتوى يرافق يومك في البيت والطريق واللحظات الهادئة.`
     );
   } else {
     headlines.push(
@@ -307,11 +237,11 @@ function buildDescriptions(language, project, localizedIndustry, hooks, seeds, a
       hooks[0] || `محتوى في ${localizedIndustry} أقرب للحياة اليومية.`,
       topSeeds.length ? `محتوى مبني حول ${topSeeds.join("، ")}.` : `محتوى يركز على القيمة والفائدة.`,
       audience ? `مصمم ليستجيب لاحتياجات ${audience}.` : `مصمم ليكون أقرب للجمهور.`,
-      `تجربة بسيطة، واضحة، وسهلة الارتباط بها.`,
+      `تجربة بسيطة وواضحة وسهلة الارتباط بها.`,
       `رسائل أقوى تساعدك في الظهور العضوي والإعلانات.`,
       `منصة تساعدك على تحويل الكلمات المفتاحية إلى جمل مؤثرة.`,
-      `محتوى أقرب للناس، وأسهل في الاستهلاك، وأكثر قابلية للتذكر.`,
-      `أسلوب يناسب الطريق، البيت، والانشغال اليومي.`,
+      `محتوى أقرب للناس وأسهل في الاستهلاك وأكثر قابلية للتذكر.`,
+      `أسلوب يناسب الطريق والبيت والانشغال اليومي.`,
       `استخدم جمهورك وكلماتك المفتاحية للحصول على نتائج أقرب للواقع.`
     );
   } else {
@@ -407,16 +337,9 @@ function buildContentIdeas(language, seeds, audience, hooks, localizedIndustry) 
 
   if (language === "ar") {
     topSeeds.forEach(seed => ideas.push(`محتوى حول ${seed}`));
-
-    if (hooks.some(h => h.includes("الطريق") || h.includes("المواصلات"))) {
-      ideas.push("محتوى مناسب للطريق والمواصلات");
-    }
-    if (hooks.some(h => h.includes("البيت") || h.includes("المنزل"))) {
-      ideas.push("محتوى يناسب ربات المنزل وأوقات البيت");
-    }
-    if (hooks.some(h => h.includes("الكبار"))) {
-      ideas.push("محتوى سهل ومريح للكبار");
-    }
+    if (hooks.some(h => h.includes("الطريق") || h.includes("المواصلات"))) ideas.push("محتوى مناسب للطريق والمواصلات");
+    if (hooks.some(h => h.includes("البيت") || h.includes("المنزل"))) ideas.push("محتوى يناسب ربات المنزل وأوقات البيت");
+    if (hooks.some(h => h.includes("الكبار"))) ideas.push("محتوى سهل ومريح للكبار");
 
     ideas.push(
       `أفكار محتوى في ${localizedIndustry}`,
@@ -427,16 +350,9 @@ function buildContentIdeas(language, seeds, audience, hooks, localizedIndustry) 
     );
   } else {
     topSeeds.forEach(seed => ideas.push(`Content around ${seed}`));
-
-    if (hooks.some(h => h.toLowerCase().includes("road") || h.toLowerCase().includes("commute"))) {
-      ideas.push("Content designed for the commute");
-    }
-    if (hooks.some(h => h.toLowerCase().includes("home"))) {
-      ideas.push("Content that fits home routines");
-    }
-    if (hooks.some(h => h.toLowerCase().includes("older"))) {
-      ideas.push("Comfortable content for older audiences");
-    }
+    if (hooks.some(h => h.toLowerCase().includes("road") || h.toLowerCase().includes("commute"))) ideas.push("Content designed for the commute");
+    if (hooks.some(h => h.toLowerCase().includes("home"))) ideas.push("Content that fits home routines");
+    if (hooks.some(h => h.toLowerCase().includes("older"))) ideas.push("Comfortable content for older audiences");
 
     ideas.push(
       `${localizedIndustry} content ideas`,
@@ -463,8 +379,7 @@ function generateResults() {
     const location = document.getElementById("location").value.trim();
     const industry = document.getElementById("industry").value.trim();
     const audience = document.getElementById("audience").value.trim();
-    const seedText = document.getElementById("seedKeywords").value.trim();
-    const seeds = parseSeedKeywords(seedText);
+    const seeds = parseSeedKeywords(document.getElementById("seedKeywords").value.trim());
 
     updateDirection(language);
 
@@ -473,18 +388,7 @@ function generateResults() {
     const audienceSignals = detectAudienceSignals(audience, language);
     const audienceHooks = buildAudienceHooks(audienceSignals, language);
 
-    const seoKeywords = makeSeoKeywords(
-      language,
-      project,
-      service,
-      localizedIndustry,
-      platformLabel,
-      seeds,
-      audience,
-      location,
-      domain
-    );
-
+    const seoKeywords = makeSeoKeywords(language, project, service, localizedIndustry, platformLabel, seeds, audience, location, domain);
     const slogans = buildSlogans(language, project, audienceHooks, localizedIndustry, domain);
     const shortHeadlines = buildShortHeadlines(language, project, localizedIndustry, audienceHooks, seeds, domain, audience);
     const longHeadlines = buildLongHeadlines(language, project, localizedIndustry, audienceHooks, seeds, domain, location);
@@ -496,37 +400,14 @@ function generateResults() {
     document.getElementById("statIndustry").textContent = localizedIndustry || "—";
     document.getElementById("statLocation").textContent = location || "—";
 
-    document.getElementById("primaryKeywords").innerHTML = seoKeywords.primary
-      .map(item => `<span class="keyword">${item}</span>`)
-      .join("");
-
-    document.getElementById("supportingKeywords").innerHTML = seoKeywords.supporting
-      .map(item => `<span class="keyword">${item}</span>`)
-      .join("");
-
-    document.getElementById("slogans").innerHTML = slogans
-      .map(item => `<div class="result-item">${item}</div>`)
-      .join("");
-
-    document.getElementById("shortHeadlines").innerHTML = shortHeadlines
-      .map(item => `<div class="result-item">${item}</div>`)
-      .join("");
-
-    document.getElementById("longHeadlines").innerHTML = longHeadlines
-      .map(item => `<div class="result-item">${item}</div>`)
-      .join("");
-
-    document.getElementById("descriptions").innerHTML = descriptions
-      .map(item => `<div class="result-item">${item}</div>`)
-      .join("");
-
-    document.getElementById("ctaButtons").innerHTML = ctas
-      .map(item => `<span class="cta">${item}</span>`)
-      .join("");
-
-    document.getElementById("contentIdeas").innerHTML = contentIdeas
-      .map(item => `<div class="result-item">${item}</div>`)
-      .join("");
+    document.getElementById("primaryKeywords").innerHTML = seoKeywords.primary.map(item => `<span class="keyword">${item}</span>`).join("");
+    document.getElementById("supportingKeywords").innerHTML = seoKeywords.supporting.map(item => `<span class="keyword">${item}</span>`).join("");
+    document.getElementById("slogans").innerHTML = slogans.map(item => `<div class="result-item">${item}</div>`).join("");
+    document.getElementById("shortHeadlines").innerHTML = shortHeadlines.map(item => `<div class="result-item">${item}</div>`).join("");
+    document.getElementById("longHeadlines").innerHTML = longHeadlines.map(item => `<div class="result-item">${item}</div>`).join("");
+    document.getElementById("descriptions").innerHTML = descriptions.map(item => `<div class="result-item">${item}</div>`).join("");
+    document.getElementById("ctaButtons").innerHTML = ctas.map(item => `<span class="cta">${item}</span>`).join("");
+    document.getElementById("contentIdeas").innerHTML = contentIdeas.map(item => `<div class="result-item">${item}</div>`).join("");
 
     hideLoader();
   }, 500);
