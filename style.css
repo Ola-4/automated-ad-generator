@@ -153,6 +153,10 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22);
 }
 
+input#url{
+border:1px solid #06b6d4;
+}
+
 textarea {
   min-height: 90px;
   resize: vertical;
