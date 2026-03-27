@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ads Generator Dashboard</title>
-  <link rel="stylesheet" href="style.css?v=4" />
+  <title>AI Marketing Assistant</title>
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <div class="page">
     <header class="hero">
       <div>
         <p class="mini-label">AI Marketing Tool</p>
-        <h1>AI Marketing Dashboard</h1>
-        <p class="hero-text">Generate ad copy, SEO keywords, CTA ideas, and content ideas in seconds</p>
+        <h1>AI Marketing Assistant</h1>
+        <p class="hero-text">Generate brand message, SEO ideas, ad headlines, CTA, and content ideas</p>
       </div>
-      <div class="hero-badge">Smart • Fast • Clean</div>
+      <div class="hero-badge">Smart • Fast • Strategic</div>
     </header>
 
     <main class="container">
@@ -31,10 +31,10 @@
         </select>
 
         <label for="projectName">Project Name</label>
-        <input id="projectName" type="text" placeholder="Example: Nova Launch" />
+        <input id="projectName" type="text" placeholder="Example: Hakaweena" />
 
         <label for="url">Website / Product URL</label>
-        <input id="url" type="text" placeholder="https://example.com/product" />
+        <input id="url" type="text" placeholder="https://example.com" />
 
         <label for="platformType">Platform Type</label>
         <select id="platformType">
@@ -50,18 +50,19 @@
         <label for="service">Service / Product</label>
         <select id="service">
           <option value="">Select</option>
-          <option>Digital Marketing</option>
-          <option>SaaS Platform</option>
-          <option>Ecommerce Store</option>
-          <option>Training Program</option>
-          <option>Consulting Service</option>
           <option>Content Portal</option>
           <option>Media Portal</option>
           <option>Learning Platform</option>
+          <option>Podcast Platform</option>
+          <option>Audiobooks Platform</option>
+          <option>Digital Marketing</option>
+          <option>SaaS Platform</option>
+          <option>Ecommerce Store</option>
+          <option>Consulting Service</option>
         </select>
 
         <label for="location">Target Location</label>
-        <input id="location" type="text" placeholder="Example: Dubai" />
+        <input id="location" type="text" placeholder="Example: Sudan / UAE / KSA" />
 
         <label for="industry">Industry</label>
         <select id="industry">
@@ -81,7 +82,10 @@
         </select>
 
         <label for="audience">Target Audience</label>
-        <textarea id="audience" placeholder="Example: young entrepreneurs"></textarea>
+        <textarea id="audience" placeholder="Example: Sudanese listeners, Arabic audience, youth, families"></textarea>
+
+        <label for="seedKeywords">Seed Keywords / كلمات أساسية</label>
+        <textarea id="seedKeywords" placeholder="Example: Sudanese podcast, Sudan history, entrepreneurship, personalities, places"></textarea>
 
         <div class="button-row">
           <button class="primary-btn" onclick="generateResults()">✨ Generate</button>
@@ -107,12 +111,64 @@
 
         <div id="loader" class="loader hidden">
           <div class="spinner"></div>
-          <p>Generating smart marketing ideas...</p>
+          <p>Generating smarter marketing output...</p>
         </div>
 
         <div class="card-panel result-card">
           <div class="card-top">
-            <h3>📣 Ad Copy</h3>
+            <h3>🧠 Brand Message</h3>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Message Angle</h4>
+              <button class="copy-btn" onclick="copyContent('brandMessage')">Copy</button>
+            </div>
+            <div id="brandMessage" class="result-list"></div>
+          </div>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>🔎 SEO Pack</h3>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>SEO Title</h4>
+              <button class="copy-btn" onclick="copyContent('seoTitle')">Copy</button>
+            </div>
+            <div id="seoTitle" class="result-list"></div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Meta Description</h4>
+              <button class="copy-btn" onclick="copyContent('metaDescription')">Copy</button>
+            </div>
+            <div id="metaDescription" class="result-list"></div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Primary Keywords</h4>
+              <button class="copy-btn" onclick="copyContent('primaryKeywords')">Copy</button>
+            </div>
+            <div id="primaryKeywords" class="tags"></div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Supporting Keywords</h4>
+              <button class="copy-btn" onclick="copyContent('lsiKeywords')">Copy</button>
+            </div>
+            <div id="lsiKeywords" class="tags"></div>
+          </div>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>📣 Ad Headlines</h3>
           </div>
 
           <div class="result-section">
@@ -134,34 +190,12 @@
 
         <div class="card-panel result-card">
           <div class="card-top">
-            <h3>🔎 SEO Hub</h3>
+            <h3>🚀 CTA</h3>
           </div>
 
           <div class="result-section">
             <div class="result-header">
-              <h4>Primary Keywords</h4>
-              <button class="copy-btn" onclick="copyContent('primaryKeywords')">Copy</button>
-            </div>
-            <div id="primaryKeywords" class="tags"></div>
-          </div>
-
-          <div class="result-section">
-            <div class="result-header">
-              <h4>LSI Keywords</h4>
-              <button class="copy-btn" onclick="copyContent('lsiKeywords')">Copy</button>
-            </div>
-            <div id="lsiKeywords" class="tags"></div>
-          </div>
-        </div>
-
-        <div class="card-panel result-card">
-          <div class="card-top">
-            <h3>🚀 CTA Magic</h3>
-          </div>
-
-          <div class="result-section">
-            <div class="result-header">
-              <h4>CTA Suggestions</h4>
+              <h4>Call To Action</h4>
               <button class="copy-btn" onclick="copyContent('ctaButtons')">Copy</button>
             </div>
             <div id="ctaButtons" class="cta-row"></div>
@@ -187,6 +221,6 @@
     </main>
   </div>
 
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
