@@ -3,56 +3,65 @@ import streamlit.components.v1 as components
 import google.generativeai as genai
 import json
 
-# 1. تفعيل وضع العرض الكامل
-st.set_page_config(layout="wide", page_title="Smart Ads Builder")
+# 1. إعداد الصفحة بأقصى عرض ممكن
+st.set_page_config(layout="wide", page_title="Smart Ads & SEO Builder")
 
-# 2. الكود السحري لمسح حواف Streamlit تماماً
+# 2. كود CSS جبار لمسح كل هوامش Streamlit وجعل الـ Iframe مالي الشاشة
 st.markdown("""
     <style>
-        /* إخفاء الهيدر ومساحات التحميل */
         header {visibility: hidden;}
         footer {visibility: hidden;}
-        
-        /* إجبار الحاوية الرئيسية تأخذ 100% من العرض */
+        #root > div:nth-child(1) > div > div > div > div > section > div {padding: 0;}
         .main .block-container {
             padding: 0 !important;
             max-width: 100% !important;
             margin: 0 !important;
         }
-        
-        /* إلغاء المسافات بين العناصر */
-        [data-testid="stVerticalBlock"] {
-            padding: 0 !important;
-            gap: 0 !important;
-        }
-        
-        /* جعل الـ iframe يملأ الشاشة */
         iframe {
-            width: 100% !important;
+            width: 100vw !important;
+            height: 100vh !important;
             border: none !important;
         }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. إعداد Gemini (تأكدي من الـ Secrets)
+# 3. إعداد Gemini
 api_key = st.secrets.get("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-pro')
 
 def get_ai_content(data):
-    prompt = f"Analyze: {data['project']}, Industry: {data['industry']}. Return JSON with: primaryKeywords, slogans, shortHeadlines, descriptions."
-    response = model.generate_content(prompt)
-    return response.text.replace('```json', '').replace('```', '').strip()
+    # حماية: لو البيانات ناقصة ما يشتغلش
+    if not data or 'project' not in data:
+        return None
+    
+    prompt = f"Create marketing strategy for {data['project']}, Industry: {data['industry']}. Return ONLY JSON with keys: primaryKeywords (list), slogans (list), shortHeadlines (list), descriptions (list)."
+    try:
+        response = model.generate_content(prompt)
+        # تنظيف الرد من أي علامات Markdown
+        clean_text = response.text.replace('```json', '').replace('```', '').strip()
+        return clean_text
+    except Exception as e:
+        return json.dumps({"error": str(e)})
 
-# 4. عرض الـ HTML بمساحة عملاقة
-with open("index.html", "r", encoding="utf-8") as f:
-    html_code = f.read()
+# 4. قراءة ملف الـ HTML
+try:
+    with open("index.html", "r", encoding="utf-8") as f:
+        html_code = f.read()
+except FileNotFoundError:
+    st.error("ملف index.html غير موجود!")
+    st.stop()
 
-# هنا بنخلي الـ height كبير جداً عشان نضمن إنه يغطي كل التصميم
-user_input = components.html(html_code, height=1800)
+# 5. تشغيل المكون وعلاج الـ TypeError
+# وضعنا القيمة الافتراضية None لمنع الخطأ في أول تشغيل
+user_input = components.html(html_code, height=1200)
 
-if user_input:
-    # لما المستخدم يضغط Generate، بنعرض النتائج
-    result = get_ai_content(user_input)
-    components.html(html_code, height=1800, spec={"ai_output": result})
+if user_input is not None:
+    # هنا نتأكد إن البيانات جات فعلاً من زر الـ Generate
+    with st.spinner("AI is thinking..."):
+        ai_res = get_ai_content(user_input)
+        if ai_res:
+            # إعادة حقن النتائج داخل الـ HTML وعرضها فوراً
+            final_html = html_code.replace("/*AI_DATA_PLACEHOLDER*/", f"const ai_output = {ai_res};")
+            components.html(final_html, height=1200)
