@@ -3,53 +3,39 @@ import streamlit.components.v1 as components
 import google.generativeai as genai
 import json
 
-st.set_page_config(layout="wide", page_title="Smart Ads Builder")
+st.set_page_config(layout="wide")
 
-# 1. تهيئة الذاكرة (Session State) لحفظ النتائج بين التحديثات
-if 'ai_results' not in st.session_state:
-    st.session_state.ai_results = None
+# تثبيت النتائج في الذاكرة
+if 'final_data' not in st.session_state:
+    st.session_state.final_data = ""
 
-# إعداد Gemini
 api_key = st.secrets.get("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-pro')
 
-def get_ai_content(data):
-    if not data or not isinstance(data, dict) or not data.get('project'):
-        return None
-    
-    prompt = f"""
-    Act as a Senior Content Developer. 
-    Project: {data['project']}, Industry: {data['industry']}, 
-    Country: {data['country']}, Language: {data['language']}.
-    Target Audience: {data.get('audience', 'General')}.
-    
-    Return ONLY a JSON object with keys: primaryKeywords, slogans, shortHeadlines, descriptions.
-    """
+def get_ai(data):
+    prompt = f"Marketing for {data['project']} in {data['industry']}. Country: {data['country']}. Language: {data['language']}. Audience: {data.get('audience', '')}. Return JSON only with: primaryKeywords, slogans, shortHeadlines, descriptions."
     try:
-        response = model.generate_content(prompt)
-        return response.text.replace('```json', '').replace('```', '').strip()
-    except:
-        return None
+        res = model.generate_content(prompt)
+        return res.text.replace('```json', '').replace('```', '').strip()
+    except: return None
 
-# 2. قراءة الـ HTML
 with open("index.html", "r", encoding="utf-8") as f:
-    html_code = f.read()
+    html = f.read()
 
-# 3. "الحقن المسبق": إذا عندنا نتائج في الذاكرة، نضعها في الكود قبل العرض
-current_html = html_code
-if st.session_state.ai_results:
-    current_html = html_code.replace("/*AI_DATA_PLACEHOLDER*/", f"const ai_output = {st.session_state.ai_results};")
+# السحر هنا: حقن البيانات من الذاكرة في الـ HTML قبل العرض
+if st.session_state.final_data:
+    html = html.replace("/*AI_DATA_PLACEHOLDER*/", f"const ai_output = {st.session_state.final_data};")
 
-# 4. عرض الواجهة (باستخدام الكود المحقون بالنتائج إن وجد)
-user_input = components.html(current_html, height=1200, scrolling=True)
+# عرض الواجهة
+ui_return = components.html(html, height=1200, scrolling=True)
 
-# 5. معالجة البيانات الجديدة عند ضغط الزر
-if user_input and isinstance(user_input, dict) and user_input.get('project'):
-    # منع التكرار: لا نطلب من AI إذا كانت النتيجة لنفس المشروع موجودة فعلاً
-    with st.spinner("AI is crafting your results..."):
-        res = get_ai_content(user_input)
-        if res:
-            st.session_state.ai_results = res
-            st.rerun() # إعادة تشغيل الصفحة فوراً لحقن النتائج وعرضها
+# إذا ضغطتي Generate والبيانات وصلت
+if ui_return and isinstance(ui_return, dict) and 'project' in ui_return:
+    if ui_return.get('project'):
+        with st.spinner("Wait..."):
+            result = get_ai(ui_return)
+            if result:
+                st.session_state.final_data = result
+                st.rerun() # إعادة التشغيل لعرض البيانات المحقونة
