@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Marketing Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="mini-label">AI Marketing Tool</p>
+        <h1>AI Marketing Assistant</h1>
+        <p class="hero-text">
+          Generate slogans, headlines, descriptions, CTA, SEO keywords, and content ideas
+        </p>
+      </div>
+      <div class="hero-badge">Smart • Clean • Country Tone</div>
+    </header>
+
+    <main class="container">
+      <section class="inputs card-panel">
+        <div class="section-head">
+          <h2>Inputs</h2>
+          <span>المدخلات</span>
+        </div>
+
+        <label for="language">Language</label>
+        <select id="language">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
+
+        <label for="projectName">Project Name</label>
+        <input id="projectName" type="text" placeholder="Example: Hakaweena" />
+
+        <label for="service">Service / Product</label>
+        <select id="service">
+          <option value="">Select Service</option>
+          <option value="Podcast Website">Podcast Website</option>
+          <option value="Audiobooks Website">Audiobooks Website</option>
+          <option value="Cooking Website">Cooking Website</option>
+          <option value="Sports Website">Sports Website</option>
+          <option value="Health Website">Health Website</option>
+          <option value="Beauty Website">Beauty Website</option>
+          <option value="Kids Content Website">Kids Content Website</option>
+          <option value="Education Website">Education Website</option>
+          <option value="Media Website">Media Website</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="country">Target Country</label>
+        <select id="country">
+          <option value="">Select Country</option>
+          <option value="Egypt">Egypt</option>
+          <option value="KSA">KSA</option>
+          <option value="UAE">UAE</option>
+        </select>
+
+        <label for="industry">Industry</label>
+        <select id="industry">
+          <option value="">Select Industry</option>
+          <option value="Podcast / Storytelling">Podcast / Storytelling</option>
+          <option value="Food / Cooking">Food / Cooking</option>
+          <option value="Technology / SaaS">Technology / SaaS</option>
+          <option value="Real Estate">Real Estate</option>
+          <option value="Health / Wellness">Health / Wellness</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Kids">Kids</option>
+          <option value="Education">Education</option>
+          <option value="Sports">Sports</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="audience">Target Audience (Detailed)</label>
+        <textarea
+          id="audience"
+          placeholder="Example: people who love listening while commuting, homemakers, older audiences"
+        ></textarea>
+
+        <label for="seedKeywords">Seed Keywords</label>
+        <textarea
+          id="seedKeywords"
+          placeholder="Example: podcast, stories, inspiring stories, audio content, culture"
+        ></textarea>
+
+        <label for="url">Website / Product URL (optional)</label>
+        <input id="url" type="text" placeholder="https://example.com" />
+
+        <div class="button-row">
+          <button class="primary-btn" onclick="generateResults()">✨ Generate</button>
+          <button class="secondary-btn" onclick="resetResults()">↺ Reset</button>
+        </div>
+      </section>
+
+      <section class="outputs">
+        <div class="stats">
+          <div class="stat-box">
+            <span>Project</span>
+            <strong id="statProject">—</strong>
+          </div>
+          <div class="stat-box">
+            <span>Industry</span>
+            <strong id="statIndustry">—</strong>
+          </div>
+          <div class="stat-box">
+            <span>Country</span>
+            <strong id="statCountry">—</strong>
+          </div>
+        </div>
+
+        <div id="loader" class="loader hidden">
+          <div class="spinner"></div>
+          <p>Generating results...</p>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>🔎 SEO Keywords</h3>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Primary Keywords</h4>
+              <button class="copy-btn" onclick="copyContent('primaryKeywords')">Copy</button>
+            </div>
+            <div id="primaryKeywords" class="tags"></div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>Supporting Keywords</h4>
+              <button class="copy-btn" onclick="copyContent('supportingKeywords')">Copy</button>
+            </div>
+            <div id="supportingKeywords" class="tags"></div>
+          </div>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>✨ Slogans</h3>
+          </div>
+          <div class="result-section">
+            <div class="result-header">
+              <h4>10 Slogans</h4>
+              <button class="copy-btn" onclick="copyContent('slogans')">Copy</button>
+            </div>
+            <div id="slogans" class="result-list"></div>
+          </div>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>📣 Ad Headlines</h3>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>10 Short Headlines</h4>
+              <button class="copy-btn" onclick="copyContent('shortHeadlines')">Copy</button>
+            </div>
+            <div id="shortHeadlines" class="result-list"></div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-header">
+              <h4>10 Long Headlines</h4>
+              <button class="copy-btn" onclick="copyContent('longHeadlines')">Copy</button>
+            </div>
+            <div id="longHeadlines" class="result-list"></div>
+          </div>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>📝 Descriptions</h3>
+          </div>
+          <div class="result-section">
+            <div class="result-header">
+              <h4>10 Descriptions</h4>
+              <button class="copy-btn" onclick="copyContent('descriptions')">Copy</button>
+            </div>
+            <div id="descriptions" class="result-list"></div>
+          </div>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>🚀 CTA</h3>
+          </div>
+          <div class="result-section">
+            <div class="result-header">
+              <h4>10 CTA Suggestions</h4>
+              <button class="copy-btn" onclick="copyContent('ctaButtons')">Copy</button>
+            </div>
+            <div id="ctaButtons" class="cta-row"></div>
+          </div>
+        </div>
+
+        <div class="card-panel result-card">
+          <div class="card-top">
+            <h3>💡 Content Ideas</h3>
+          </div>
+          <div class="result-section">
+            <div class="result-header">
+              <h4>10 Ideas</h4>
+              <button class="copy-btn" onclick="copyContent('contentIdeas')">Copy</button>
+            </div>
+            <div id="contentIdeas" class="result-list"></div>
+          </div>
+        </div>
+
+        <div id="toast" class="toast">Copied successfully</div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
