@@ -1,71 +1,73 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
-        .main-container { display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; }
-        .card { background: #1e293b; padding: 20px; border-radius: 15px; border: 1px solid #334155; }
-        label { display: block; margin: 15px 0 5px; color: #94a3b8; font-size: 14px; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
-        .btn { width: 100%; padding: 15px; margin-top: 20px; border-radius: 10px; background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .res-card { min-height: 200px; border-top: 4px solid #7c3aed; }
-        .tag { background: #7c3aed; padding: 5px 12px; border-radius: 20px; margin: 4px; display: inline-block; font-size: 13px; }
-        .list-item { border-right: 3px solid #06b6d4; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.03); direction: rtl; }
+        body { background: #0f172a; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; padding: 15px; margin: 0; }
+        .form-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h3 { color: #7c3aed; margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        label { display: block; margin: 12px 0 5px; font-size: 14px; color: #94a3b8; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; 
+            background: #0f172a; color: white; outline: none; font-size: 14px;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #7c3aed; }
+        button { 
+            width: 100%; padding: 15px; margin-top: 20px; border-radius: 8px; 
+            background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; 
+            border: none; font-weight: bold; cursor: pointer; font-size: 16px;
+        }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
     </style>
 </head>
-<body dir="rtl">
-    <div class="main-container">
-        <aside class="card">
-            <h3>الإعدادات ⚙️</h3>
-            <label>اسم المشروع</label>
-            <input id="pName" placeholder="مثلاً: هكاوينا">
-            <label>اللغة</label>
-            <select id="lang">
-                <option value="ar">العربية</option>
-                <option value="en">English</option>
-            </select>
-            <label>المجال</label>
-            <select id="ind">
-                <option value="Podcast">بودكاست</option>
-                <option value="Cooking">طبخ</option>
-                <option value="E-commerce">تجارة إلكترونية</option>
-            </select>
-            <label>الجمهور المستهدف</label>
-            <textarea id="aud" rows="4"></textarea>
-            <button class="btn" id="genBtn">✨ توليد المحتوى</button>
-        </aside>
+<body>
+    <div class="form-card">
+        <h3>إعدادات الحملة الإبداعية 🎨</h3>
+        
+        <label>اسم المشروع</label>
+        <input id="pName" placeholder="مثلاً: هكاوينا">
 
-        <main class="results-grid">
-            <div class="card res-card"><h3>🔎 كلمات البحث</h3><div id="k"></div></div>
-            <div class="card res-card"><h3>✨ الشعارات</h3><div id="s"></div></div>
-            <div class="card res-card"><h3>📣 العناوين</h3><div id="h"></div></div>
-            <div class="card res-card"><h3>📝 الأوصاف</h3><div id="d"></div></div>
-        </main>
+        <label>لغة المحتوى المطلوبة</label>
+        <select id="lang" onchange="document.documentElement.dir = (this.value === 'ar' ? 'rtl' : 'ltr');">
+            <option value="ar">العربية (Arabic)</option>
+            <option value="en">الإنجليزية (English)</option>
+        </select>
+
+        <label>المجال / التخصص</label>
+        <select id="ind">
+            <option value="Podcast">بودكاست (Podcast)</option>
+            <option value="Cooking">طبخ (Cooking)</option>
+            <option value="SaaS">برمجيات (SaaS/Tech)</option>
+            <option value="Real Estate">عقارات (Real Estate)</option>
+            <option value="E-commerce">تجارة إلكترونية (E-commerce)</option>
+            <option value="Education">تعليم (Education)</option>
+            <option value="Health">صحة ولياقة (Health)</option>
+        </select>
+
+        <label>الجمهور المستهدف</label>
+        <textarea id="aud" rows="3" placeholder="من هم جمهورك؟ (مثلاً: الشباب المهتم بالثقافة السودانية)"></textarea>
+
+        <button id="genBtn">✨ توليد المحتوى الآن</button>
     </div>
 
     <script>
         document.getElementById('genBtn').onclick = function() {
             const name = document.getElementById('pName').value.trim();
-            if(!name) return alert("الرجاء إدخال اسم المشروع");
-            this.innerText = "...جاري التحضير";
-            this.disabled = true;
-            window.parent.postMessage({type: 'streamlit:setComponentValue', value: {
-                project: name, language: document.getElementById('lang').value,
-                industry: document.getElementById('ind').value, audience: document.getElementById('aud').value
-            }}, '*');
-        };
+            if(!name) return alert("يا علا، اكتبي اسم المشروع أولاً!");
+            
+            this.innerText = "...جاري إرسال البيانات";
+            this.style.opacity = "0.7";
 
-        /*AI_DATA_PLACEHOLDER*/
-        if (typeof ai_output !== 'undefined' && ai_output) {
-            document.getElementById('k').innerHTML = ai_output.primaryKeywords.map(i => `<span class="tag">${i}</span>`).join('');
-            document.getElementById('s').innerHTML = ai_output.slogans.map(i => `<div class="list-item">${i}</div>`).join('');
-            document.getElementById('h').innerHTML = ai_output.shortHeadlines.map(i => `<div class="list-item">${i}</div>`).join('');
-            document.getElementById('d').innerHTML = ai_output.descriptions.map(i => `<div class="list-item">${i}</div>`).join('');
-        }
+            window.parent.postMessage({
+                type: 'streamlit:setComponentValue', 
+                value: {
+                    project: name,
+                    industry: document.getElementById('ind').value,
+                    language: document.getElementById('lang').value,
+                    audience: document.getElementById('aud').value
+                }
+            }, '*');
+        };
     </script>
 </body>
 </html>
