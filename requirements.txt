@@ -1,6 +1,2 @@
 streamlit
-google-generativeai
-flask
-google-generativeai
-streamlit
 google-genai
