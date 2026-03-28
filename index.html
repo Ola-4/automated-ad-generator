@@ -1,60 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; padding: 20px; }
-        .grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
-        input, select, textarea { width: 100%; margin: 10px 0; padding: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px; }
-        button { width: 100%; padding: 15px; background: #7c3aed; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; }
-        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .res-item { background: #1e293b; padding: 15px; border-top: 4px solid #7c3aed; border-radius: 5px; min-height: 150px; }
-        .tag { background: #7c3aed; padding: 4px 10px; border-radius: 15px; margin: 3px; display: inline-block; font-size: 12px; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
+        .main-container { display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 15px; border: 1px solid #334155; }
+        label { display: block; margin: 15px 0 5px; color: #94a3b8; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .btn { width: 100%; padding: 15px; margin-top: 20px; border-radius: 10px; background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .res-card { min-height: 200px; border-top: 4px solid #7c3aed; }
+        .tag { background: #7c3aed; padding: 5px 12px; border-radius: 20px; margin: 4px; display: inline-block; font-size: 13px; }
+        .list-item { border-right: 3px solid #06b6d4; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.03); direction: rtl; }
     </style>
 </head>
-<body>
-    <div class="grid">
-        <div class="card">
-            <h3>Settings</h3>
-            <input id="pName" placeholder="Project Name">
-            <select id="lang" onchange="document.body.dir = (this.value=='ar'?'rtl':'ltr')">
-                <option value="en">English</option>
+<body dir="rtl">
+    <div class="main-container">
+        <aside class="card">
+            <h3>الإعدادات ⚙️</h3>
+            <label>اسم المشروع</label>
+            <input id="pName" placeholder="مثلاً: هكاوينا">
+            <label>اللغة</label>
+            <select id="lang">
                 <option value="ar">العربية</option>
+                <option value="en">English</option>
             </select>
+            <label>المجال</label>
             <select id="ind">
-                <option value="Podcast">Podcast / بودكاست</option>
-                <option value="Cooking">Cooking / طبخ</option>
-                <option value="SaaS">Software / برمجيات</option>
+                <option value="Podcast">بودكاست</option>
+                <option value="Cooking">طبخ</option>
+                <option value="E-commerce">تجارة إلكترونية</option>
             </select>
-            <textarea id="aud" rows="3" placeholder="Target Audience"></textarea>
-            <button id="btn">✨ Generate Now</button>
-        </div>
-        <div class="res-grid">
-            <div class="res-item"><h4>Keywords</h4><div id="k"></div></div>
-            <div class="res-item"><h4>Slogans</h4><div id="s"></div></div>
-            <div class="res-item"><h4>Headlines</h4><div id="h"></div></div>
-            <div class="res-item"><h4>Descriptions</h4><div id="d"></div></div>
-        </div>
+            <label>الجمهور المستهدف</label>
+            <textarea id="aud" rows="4"></textarea>
+            <button class="btn" id="genBtn">✨ توليد المحتوى</button>
+        </aside>
+
+        <main class="results-grid">
+            <div class="card res-card"><h3>🔎 كلمات البحث</h3><div id="k"></div></div>
+            <div class="card res-card"><h3>✨ الشعارات</h3><div id="s"></div></div>
+            <div class="card res-card"><h3>📣 العناوين</h3><div id="h"></div></div>
+            <div class="card res-card"><h3>📝 الأوصاف</h3><div id="d"></div></div>
+        </main>
     </div>
+
     <script>
-        document.getElementById('btn').onclick = function() {
-            const val = document.getElementById('pName').value.trim();
-            if(!val) return alert("Enter Name!");
-            this.innerText = "...Loading";
+        document.getElementById('genBtn').onclick = function() {
+            const name = document.getElementById('pName').value.trim();
+            if(!name) return alert("الرجاء إدخال اسم المشروع");
+            this.innerText = "...جاري التحضير";
+            this.disabled = true;
             window.parent.postMessage({type: 'streamlit:setComponentValue', value: {
-                project: val, industry: document.getElementById('ind').value,
-                language: document.getElementById('lang').value, country: 'Sudan',
-                audience: document.getElementById('aud').value
+                project: name, language: document.getElementById('lang').value,
+                industry: document.getElementById('ind').value, audience: document.getElementById('aud').value
             }}, '*');
         };
 
         /*AI_DATA_PLACEHOLDER*/
         if (typeof ai_output !== 'undefined' && ai_output) {
             document.getElementById('k').innerHTML = ai_output.primaryKeywords.map(i => `<span class="tag">${i}</span>`).join('');
-            document.getElementById('s').innerHTML = ai_output.slogans.map(i => `<div>• ${i}</div>`).join('<br>');
-            document.getElementById('h').innerHTML = ai_output.shortHeadlines.map(i => `<div>• ${i}</div>`).join('<br>');
-            document.getElementById('d').innerHTML = ai_output.descriptions.map(i => `<div>• ${i}</div>`).join('<br>');
+            document.getElementById('s').innerHTML = ai_output.slogans.map(i => `<div class="list-item">${i}</div>`).join('');
+            document.getElementById('h').innerHTML = ai_output.shortHeadlines.map(i => `<div class="list-item">${i}</div>`).join('');
+            document.getElementById('d').innerHTML = ai_output.descriptions.map(i => `<div class="list-item">${i}</div>`).join('');
         }
     </script>
 </body>
