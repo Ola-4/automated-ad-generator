@@ -1,239 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Ads & SEO Builder | Ola Osman</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Ads Builder</title>
     <style>
-        /* إعدادات الشاشة الكاملة والخلفية */
         * { box-sizing: border-box; }
         body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 28%),
-                        radial-gradient(circle at top right, rgba(6, 182, 212, 0.22), transparent 26%),
-                        linear-gradient(135deg, #0f172a, #111827, #1e293b);
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
+            margin: 0; font-family: 'Segoe UI', sans-serif;
+            background: #0f172a; color: white; min-height: 100vh;
         }
-
-   .page {
-    width: 100vw; /* يأخذ عرض الشاشة بالكامل */
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-        /* الهيدر */
+        .page { width: 100%; max-width: 98%; margin: 0 auto; padding: 20px; }
         .hero {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 30px;
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            margin-bottom: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
         }
-
-        .hero h1 { margin: 0; font-size: 32px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-badge { background: linear-gradient(135deg, #7c3aed, #06b6d4); padding: 10px 20px; border-radius: 50px; font-weight: bold; font-size: 14px; }
-
-        /* تقسيم الصفحة */
-        .container {
-            display: grid;
-            grid-template-columns: 350px 1fr; /* عمود جانبي للمدخلات والباقي للنتائج */
-            gap: 25px;
-            align-items: start;
-        }
-
-        .card-panel {
-            background: rgba(255, 255, 255, 0.06);
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-        }
-
-        /* التصميم الداخلي للمدخلات */
-        label { display: block; margin: 15px 0 5px; color: #cbd5e1; font-weight: 500; }
+        .container { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+        .card { background: rgba(255,255,255,0.07); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        label { display: block; margin: 15px 0 5px; color: #94a3b8; }
         input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(15, 23, 42, 0.5);
-            color: white;
-            outline: none;
-            transition: 0.3s;
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155;
+            background: #1e293b; color: white; outline: none;
         }
-        input:focus, textarea:focus { border-color: #7c3aed; box-shadow: 0 0 10px rgba(124, 58, 237, 0.3); }
-
         .primary-btn {
-            width: 100%;
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 16px;
+            width: 100%; margin-top: 20px; padding: 15px; border-radius: 10px;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white;
+            border: none; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-        .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); }
-
-        /* منطقة النتائج */
-        .outputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
-
-        .result-card { min-height: 200px; }
-        .result-card h3 { margin-top: 0; color: #a78bfa; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-
-        .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-        .keyword { background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.3); padding: 6px 15px; border-radius: 20px; font-size: 13px; color: #ddd; }
-        
-        .result-list { list-style: none; padding: 0; }
-        .result-item { 
-            background: rgba(255,255,255,0.03); 
-            padding: 12px; 
-            border-radius: 10px; 
-            margin-bottom: 8px; 
-            border-left: 4px solid #06b6d4;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* لودر التحميل */
-        .hidden { display: none; }
-        .loader { text-align: center; padding: 20px; color: #7c3aed; font-weight: bold; }
-
-        @media (max-width: 1024px) {
-            .container { grid-template-columns: 1fr; }
-        }
+        .outputs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .res-box { min-height: 150px; }
+        .tag { background: #7c3aed; padding: 5px 12px; border-radius: 20px; margin: 4px; display: inline-block; font-size: 13px; }
+        .list-item { border-left: 3px solid #06b6d4; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="page">
         <header class="hero">
-            <div>
-                <h1>Smart Ads & SEO Builder</h1>
-                <p style="color: #94a3b8; margin: 5px 0 0;">Advanced AI Content Strategy Dashboard</p>
-            </div>
-            <div class="hero-badge">Ola Osman • Senior Developer</div>
+            <div><h1 id="mainTitle">Smart Ads & SEO Builder</h1></div>
+            <div style="background:#7c3aed; padding:8px 15px; border-radius:30px; font-weight:bold;">Ola Osman • Senior Developer</div>
         </header>
 
-        <main class="container">
-            <section class="card-panel">
-                <h2 style="margin-top:0">Settings</h2>
+        <div class="container">
+            <aside class="card">
+                <label id="lblProject">Project Name</label>
+                <input id="projectName" type="text" placeholder="Hajja Portal...">
                 
-                <label>Project Name</label>
-                <input id="projectName" type="text" placeholder="e.g. Hajja Portal" />
-
-                <label>Industry</label>
-                <select id="industry">
-                    <option>Technology</option>
-                    <option>Podcast / Storytelling</option>
-                    <option>Education</option>
-                    <option>Food / Cooking</option>
-                    <option>Health / Wellness</option>
-                </select>
-
-                <label>Language</label>
-                <select id="language">
+                <label id="lblLanguage">Interface Language</label>
+                <select id="language" onchange="updateUI(this.value)">
                     <option value="en">English</option>
                     <option value="ar">العربية</option>
                 </select>
 
-                <label>Target Audience</label>
-                <textarea id="audience" rows="3" placeholder="Who are you targeting?"></textarea>
+                <label id="lblCountry">Target Country</label>
+                <select id="country">
+                    <option value="Sudan">Sudan 🇸🇩</option>
+                    <option value="Egypt">Egypt 🇪🇬</option>
+                    <option value="Saudi Arabia">Saudi Arabia 🇸🇦</option>
+                    <option value="UAE">UAE 🇦🇪</option>
+                </select>
 
+                <label id="lblIndustry">Industry</label>
+                <select id="industry">
+                    <option>Technology</option><option>Education</option><option>Podcast</option>
+                </select>
+
+                <label id="lblAudience">Target Audience</label>
+                <textarea id="audience" rows="3"></textarea>
+                
                 <button class="primary-btn" id="generateBtn">✨ Generate Content</button>
-            </section>
+            </aside>
 
-            <section class="outputs">
-                <div class="card-panel result-card">
-                    <h3>🔎 SEO Keywords</h3>
-                    <div id="primaryKeywords" class="tags"></div>
-                </div>
-
-                <div class="card-panel result-card">
-                    <h3>✨ Slogans</h3>
-                    <div id="slogans" class="result-list"></div>
-                </div>
-
-                <div class="card-panel result-card">
-                    <h3>📣 Headlines</h3>
-                    <div id="shortHeadlines" class="result-list"></div>
-                </div>
-
-                <div class="card-panel result-card">
-                    <h3>📝 Descriptions</h3>
-                    <div id="descriptions" class="result-list"></div>
-                </div>
-            </section>
-        </main>
+            <main class="outputs">
+                <div class="card res-box"> <h3 id="hSEO">🔎 SEO Keywords</h3> <div id="primaryKeywords"></div> </div>
+                <div class="card res-box"> <h3 id="hSlogans">✨ Slogans</h3> <div id="slogans"></div> </div>
+                <div class="card res-box"> <h3 id="hHeadlines">📣 Headlines</h3> <div id="shortHeadlines"></div> </div>
+                <div class="card res-box"> <h3 id="hDesc">📝 Descriptions</h3> <div id="descriptions"></div> </div>
+            </main>
+        </div>
     </div>
 
     <script>
-        const btn = document.getElementById('generateBtn');
+        const translations = {
+            en: { title: "Smart Ads & SEO Builder", project: "Project Name", lang: "Interface Language", country: "Target Country", ind: "Industry", aud: "Target Audience", btn: "✨ Generate Content", dir: "ltr" },
+            ar: { title: "صانع الإعلانات والـ SEO", project: "اسم المشروع", lang: "لغة الواجهة", country: "الدولة المستهدفة", ind: "المجال", aud: "الجمهور المستهدف", btn: "✨ توليد المحتوى", dir: "rtl" }
+        };
 
-        // إرسال البيانات لـ Streamlit
-        btn.addEventListener('click', () => {
+        function updateUI(lang) {
+            const t = translations[lang];
+            document.getElementById('mainTitle').innerText = t.title;
+            document.getElementById('lblProject').innerText = t.project;
+            document.getElementById('lblLanguage').innerText = t.lang;
+            document.getElementById('lblCountry').innerText = t.country;
+            document.getElementById('lblIndustry').innerText = t.ind;
+            document.getElementById('lblAudience').innerText = t.aud;
+            document.getElementById('generateBtn').innerText = t.btn;
+            document.body.style.direction = t.dir;
+        }
+
+        document.getElementById('generateBtn').addEventListener('click', () => {
+            const btn = document.getElementById('generateBtn');
+            btn.innerText = "Processing..."; btn.style.opacity = "0.5";
             const data = {
                 project: document.getElementById('projectName').value,
                 industry: document.getElementById('industry').value,
                 language: document.getElementById('language').value,
+                country: document.getElementById('country').value,
                 audience: document.getElementById('audience').value
             };
-
-            if(!data.project) { alert("Please enter a project name!"); return; }
-
-            // تفعيل حالة التحميل
-            btn.innerText = "Processing with Gemini...";
-            btn.style.opacity = "0.7";
-
-            window.parent.postMessage({
-                type: 'streamlit:setComponentValue',
-                value: data
-            }, '*');
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: data}, '*');
         });
 
-        // استقبال النتائج من الـ Python (Streamlit)
-        window.addEventListener('message', (event) => {
-            if (event.data.type === 'streamlit:render') {
-                const aiData = event.data.args.ai_output;
-                if (aiData) {
-                    try {
-                        const res = JSON.parse(aiData);
-                        
-                        // توزيع البيانات على المربعات
-                        if(res.primaryKeywords) {
-                            document.getElementById('primaryKeywords').innerHTML = res.primaryKeywords.map(k => `<span class="keyword">${k}</span>`).join('');
-                        }
-                        if(res.slogans) {
-                            document.getElementById('slogans').innerHTML = res.slogans.map(s => `<div class="result-item">${s}</div>`).join('');
-                        }
-                        if(res.shortHeadlines) {
-                            document.getElementById('shortHeadlines').innerHTML = res.shortHeadlines.map(h => `<div class="result-item">${h}</div>`).join('');
-                        }
-                        if(res.descriptions) {
-                            document.getElementById('descriptions').innerHTML = res.descriptions.map(d => `<div class="result-item">${d}</div>`).join('');
-                        }
-
-                        // إعادة حالة الزر
-                        btn.innerText = "✨ Generate Content";
-                        btn.style.opacity = "1";
-                    } catch (e) {
-                        console.error("JSON Error:", e);
-                        btn.innerText = "Error in formatting";
-                    }
-                }
-            }
-        });
+        /*AI_DATA_PLACEHOLDER*/
+        if (typeof ai_output !== 'undefined') {
+            const res = ai_output;
+            document.getElementById('primaryKeywords').innerHTML = res.primaryKeywords.map(k => `<span class="tag">${k}</span>`).join('');
+            document.getElementById('slogans').innerHTML = res.slogans.map(s => `<div class="list-item">${s}</div>`).join('');
+            document.getElementById('shortHeadlines').innerHTML = res.shortHeadlines.map(h => `<div class="list-item">${h}</div>`).join('');
+            document.getElementById('descriptions').innerHTML = res.descriptions.map(d => `<div class="list-item">${d}</div>`).join('');
+        }
     </script>
 </body>
 </html>
