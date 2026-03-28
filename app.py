@@ -81,7 +81,7 @@ textarea::placeholder {
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🚀 محرك صناعة المحتوى الذكي")
+st.title("🚀 Smart Ads Generator")
 st.write("أداة احترافية لتوليد خطط المحتوى، SEO، الشعارات، العناوين، والأفكار التسويقية.")
 
 api_key = st.secrets.get("GEMINI_API_KEY")
