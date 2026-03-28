@@ -197,8 +197,26 @@ Return this exact JSON structure:
                     st.subheader("📣 Short Headlines")
                     for h in res["short_headlines"]:
                         st.markdown(
-                            f'<div class="info-card">{h}</div>',
-                            unsafe_allow_html=True
+                           st.markdown("""
+<style>
+
+.main {
+    background-color: #0f172a;
+}
+
+/* Labels */
+label {
+    color: #f1f5f9 !important;
+    font-weight: 600;
+}
+
+/* Inputs */
+.stTextInput input,
+.stSelectbox div[data-baseweb="select"],
+.stTextArea textarea {
+
+    background-color: #ffffff !important;
+    color
                         )
 
                     st.subheader("📢 Long Headlines")
