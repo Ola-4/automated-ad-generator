@@ -4,636 +4,98 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Ads & SEO Builder</title>
-  <link rel="stylesheet" href="style.css?v=21" />
   <style>
-    * {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 28%),
-    radial-gradient(circle at top right, rgba(6, 182, 212, 0.22), transparent 26%),
-    linear-gradient(135deg, #0f172a, #111827, #1e293b);
-  color: white;
-  min-height: 100vh;
-}
-
-.page {
-  max-width: 1440px;
-  margin: auto;
-  padding: 28px 18px;
-}
-
-.hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 24px;
-  padding: 24px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
-}
-
-.mini-label {
-  margin: 0 0 8px;
-  color: #c4b5fd;
-  font-size: 13px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.hero h1 {
-  margin: 0 0 10px;
-  font-size: 42px;
-}
-
-.hero-text {
-  margin: 0;
-  color: #cbd5e1;
-  font-size: 17px;
-}
-
-.hero-badge {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
-  padding: 12px 18px;
-  border-radius: 999px;
-  font-weight: bold;
-  white-space: nowrap;
-  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35);
-}
-
-.container {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 24px;
-}
-
-.card-panel {
-  background: rgba(255, 255, 255, 0.07);
-  padding: 24px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.2);
-}
-
-.section-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.section-head h2 {
-  margin: 0;
-}
-
-.section-head span {
-  color: #cbd5e1;
-  font-size: 14px;
-}
-
-label {
-  display: block;
-  margin-top: 14px;
-  margin-bottom: 6px;
-  font-weight: bold;
-  color: #e2e8f0;
-}
-
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.09);
-  color: white;
-  font-size: 15px;
-  outline: none;
-  transition: 0.25s ease;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #cbd5e1;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22);
-}
-
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-}
-
-select option {
-  background: #1e293b;
-  color: white;
-}
-
-input#url,
-textarea#seedKeywords,
-textarea#audience {
-  border: 1px solid #06b6d4;
-}
-
-textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.button-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 22px;
-}
-
-button {
-  border: none;
-  border-radius: 12px;
-  padding: 13px;
-  color: white;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.primary-btn {
-  flex: 1;
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
-}
-
-.secondary-btn {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.22);
-}
-
-.outputs {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  position: relative;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-.stat-box {
-  background: rgba(255, 255, 255, 0.07);
-  padding: 18px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.stat-box span {
-  display: block;
-  color: #94a3b8;
-  font-size: 13px;
-  margin-bottom: 8px;
-}
-
-.stat-box strong {
-  font-size: 22px;
-}
-
-.card-top h3 {
-  margin: 0 0 8px;
-}
-
-.result-section {
-  margin-top: 18px;
-}
-
-.result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.result-header h4 {
-  margin: 0;
-  color: #cbd5e1;
-}
-
-.copy-btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  font-size: 13px;
-}
-
-.result-list {
-  display: grid;
-  gap: 10px;
-}
-
-.result-item {
-  background: rgba(15, 23, 42, 0.6);
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  animation: fadeUp 0.35s ease;
-  line-height: 1.6;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.keyword {
-  display: inline-block;
-  background: rgba(51, 65, 85, 0.95);
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: #e2e8f0;
-  animation: fadeUp 0.35s ease;
-}
-
-.cta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.cta {
-  display: inline-block;
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: bold;
-  animation: fadeUp 0.35s ease;
-}
-
-.empty {
-  color: #94a3b8;
-  font-style: italic;
-}
-
-.loader {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.hidden {
-  display: none;
-}
-
-.spinner {
-  width: 22px;
-  height: 22px;
-  border: 3px solid rgba(255, 255, 255, 0.18);
-  border-top: 3px solid #7c3aed;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-.toast {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  background: #111827;
-  color: white;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  transition: 0.3s ease;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-body[dir="rtl"] {
-  text-align: right;
-}
-
-body[dir="rtl"] .section-head,
-body[dir="rtl"] .result-header,
-body[dir="rtl"] .hero,
-body[dir="rtl"] .card-top,
-body[dir="rtl"] .stats {
-  direction: rtl;
-}
-
-body[dir="rtl"] input,
-body[dir="rtl"] textarea,
-body[dir="rtl"] select {
-  text-align: right;
-}
-
-body[dir="rtl"] .hero {
-  flex-direction: row-reverse;
-}
-
-body[dir="rtl"] .section-head {
-  flex-direction: row-reverse;
-}
-
-body[dir="rtl"] .result-header {
-  flex-direction: row-reverse;
-}
-
-body[dir="rtl"] .cta-row,
-body[dir="rtl"] .tags {
-  justify-content: flex-start;
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 980px) {
-  .container {
-    grid-template-columns: 1fr;
-  }
-
-  .stats {
-    grid-template-columns: 1fr;
-  }
-
-  .hero {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  body[dir="rtl"] .hero {
-    flex-direction: column;
-    align-items: flex-end;
-  }
-}
+    /* هنا كود الـ CSS بتاعك اللي إنتِ كتبتيه */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 28%),
+                  radial-gradient(circle at top right, rgba(6, 182, 212, 0.22), transparent 26%),
+                  linear-gradient(135deg, #0f172a, #111827, #1e293b);
+      color: white; min-height: 100vh;
+    }
+    .page { max-width: 1440px; margin: auto; padding: 28px 18px; }
+    .hero { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 24px; padding: 24px; border-radius: 24px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(14px); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22); }
+    .hero-badge { background: linear-gradient(135deg, #7c3aed, #06b6d4); padding: 12px 18px; border-radius: 999px; font-weight: bold; white-space: nowrap; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35); }
+    .container { display: grid; grid-template-columns: 400px 1fr; gap: 24px; }
+    .card-panel { background: rgba(255, 255, 255, 0.07); padding: 24px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.09); backdrop-filter: blur(12px); }
+    input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; }
+    .primary-btn { width: 100%; background: linear-gradient(135deg, #7c3aed, #6d28d9); padding: 15px; border-radius: 12px; cursor: pointer; border: none; color: white; font-weight: bold; margin-top: 20px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .keyword { background: #334155; padding: 6px 12px; border-radius: 20px; font-size: 14px; }
+    .result-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #7c3aed; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="page">
     <header class="hero">
       <div>
-        <p class="mini-label">AI Marketing Tool</p>
         <h1>Smart Ads & SEO Builder</h1>
-        <p class="hero-text">
-          Generate slogans, headlines, descriptions, CTA, SEO keywords, and content ideas
-        </p>
+        <p>Generate high-quality marketing content with AI</p>
       </div>
-      <div class="hero-badge">Clean • Simple • Working</div>
+      <div class="hero-badge">Ola Osman Edition</div>
     </header>
 
-    <main class="container">
-      <section class="inputs card-panel">
-        <div class="section-head">
-          <h2>Inputs</h2>
-          <span>المدخلات</span>
-        </div>
-
-        <label for="language">Language</label>
-        <select id="language">
-          <option value="en">English</option>
-          <option value="ar">العربية</option>
-        </select>
-
-        <label for="projectName">Project Name</label>
-        <input id="projectName" type="text" placeholder="Example: Hakaweena" />
-
-        <label for="url">Website / Product URL</label>
-        <input id="url" type="text" placeholder="https://example.com" />
-
-        <label for="industry">Industry</label>
+    <div class="container">
+      <div class="card-panel">
+        <label>Project Name</label>
+        <input id="projectName" placeholder="Hajja Portal..." />
+        <label>Industry</label>
         <select id="industry">
-          <option value="">Select</option>
-          <option>Food / Cooking</option>
-          <option>Podcast / Storytelling</option>
-          <option>Audiobooks / Books</option>
-          <option>Sports</option>
-          <option>Health / Wellness</option>
-          <option>Beauty</option>
-          <option>Kids</option>
-          <option>Education</option>
-          <option>Technology</option>
-          <option>Retail</option>
-          <option>Finance</option>
-          <option>Travel</option>
+            <option>Podcast / Storytelling</option>
+            <option>Technology</option>
+            <option>Education</option>
         </select>
+        <label>Language</label>
+        <select id="language">
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+        </select>
+        <button class="primary-btn" id="generateBtn">✨ Generate Strategy</button>
+      </div>
 
-        <label for="audience">Target Audience / الفئة المستهدفة (Detailed)</label>
-        <textarea
-          id="audience"
-          placeholder="Example: people who love listening while commuting, homemakers, older audiences"
-        ></textarea>
-
-        <label for="seedKeywords">Seed Keywords / الكلمات المفتاحية الأساسية</label>
-        <textarea
-          id="seedKeywords"
-          placeholder="Example: podcast, stories, inspiring stories, audio content, culture"
-        ></textarea>
-
-        <div class="button-row">
-          <button class="primary-btn" onclick="generateResults()">✨ Generate</button>
-          <button class="secondary-btn" onclick="resetResults()">↺ Reset</button>
+      <div class="outputs">
+        <div class="card-panel">
+          <h3>🔎 SEO Keywords</h3>
+          <div id="primaryKeywords" class="tags"></div>
         </div>
-      </section>
-
-      <section class="outputs">
-        <div class="stats">
-          <div class="stat-box">
-            <span>Project</span>
-            <strong id="statProject">—</strong>
-          </div>
-          <div class="stat-box">
-            <span>Industry</span>
-            <strong id="statIndustry">—</strong>
-          </div>
-          <div class="stat-box">
-            <span>Location</span>
-            <strong id="statLocation">—</strong>
-          </div>
+        <div class="card-panel">
+          <h3>✨ Slogans</h3>
+          <div id="slogans" class="result-list"></div>
         </div>
-
-        <div id="loader" class="loader hidden">
-          <div class="spinner"></div>
-          <p>Generating results...</p>
-        </div>
-
-        <div class="card-panel result-card">
-          <div class="card-top">
-            <h3>🔎 SEO Keywords</h3>
-          </div>
-
-          <div class="result-section">
-            <div class="result-header">
-              <h4>Primary Keywords</h4>
-              <button class="copy-btn" onclick="copyContent('primaryKeywords')">Copy</button>
-            </div>
-            <div id="primaryKeywords" class="tags"></div>
-          </div>
-
-          <div class="result-section">
-            <div class="result-header">
-              <h4>Supporting Keywords</h4>
-              <button class="copy-btn" onclick="copyContent('supportingKeywords')">Copy</button>
-            </div>
-            <div id="supportingKeywords" class="tags"></div>
-          </div>
-        </div>
-
-        <div class="card-panel result-card">
-          <div class="card-top">
-            <h3>✨ Slogans</h3>
-          </div>
-          <div class="result-section">
-            <div class="result-header">
-              <h4>10 Slogans</h4>
-              <button class="copy-btn" onclick="copyContent('slogans')">Copy</button>
-            </div>
-            <div id="slogans" class="result-list"></div>
-          </div>
-        </div>
-
-        <div class="card-panel result-card">
-          <div class="card-top">
-            <h3>📣 Ad Headlines</h3>
-          </div>
-
-          <div class="result-section">
-            <div class="result-header">
-              <h4>10 Short Headlines</h4>
-              <button class="copy-btn" onclick="copyContent('shortHeadlines')">Copy</button>
-            </div>
-            <div id="shortHeadlines" class="result-list"></div>
-          </div>
-
-          <div class="result-section">
-            <div class="result-header">
-              <h4>10 Long Headlines</h4>
-              <button class="copy-btn" onclick="copyContent('longHeadlines')">Copy</button>
-            </div>
-            <div id="longHeadlines" class="result-list"></div>
-          </div>
-        </div>
-
-        <div class="card-panel result-card">
-          <div class="card-top">
-            <h3>📝 Descriptions</h3>
-          </div>
-          <div class="result-section">
-            <div class="result-header">
-              <h4>10 Descriptions</h4>
-              <button class="copy-btn" onclick="copyContent('descriptions')">Copy</button>
-            </div>
-            <div id="descriptions" class="result-list"></div>
-          </div>
-        </div>
-
-        <div class="card-panel result-card">
-          <div class="card-top">
-            <h3>🚀 CTA</h3>
-          </div>
-          <div class="result-section">
-            <div class="result-header">
-              <h4>10 CTA Suggestions</h4>
-              <button class="copy-btn" onclick="copyContent('ctaButtons')">Copy</button>
-            </div>
-            <div id="ctaButtons" class="cta-row"></div>
-          </div>
-        </div>
-
-        <div class="card-panel result-card">
-          <div class="card-top">
-            <h3>💡 Content Ideas</h3>
-          </div>
-          <div class="result-section">
-            <div class="result-header">
-              <h4>10 Ideas</h4>
-              <button class="copy-btn" onclick="copyContent('contentIdeas')">Copy</button>
-            </div>
-            <div id="contentIdeas" class="result-list"></div>
-          </div>
-        </div>
-
-        <div id="toast" class="toast">Copied successfully</div>
-      </section>
-    </main>
+      </div>
+    </div>
   </div>
 
   <script>
-    import streamlit as st
-import streamlit.components.v1 as components
-import google.generativeai as genai
-import os
-import json
+    const btn = document.getElementById('generateBtn');
+    btn.addEventListener('click', () => {
+        const data = {
+            project: document.getElementById('projectName').value,
+            industry: document.getElementById('industry').value,
+            language: document.getElementById('language').value
+        };
+        // إرسال البيانات لـ Streamlit
+        window.parent.postMessage({
+            type: 'streamlit:setComponentValue',
+            value: data
+        }, '*');
+        btn.innerText = "Generating...";
+    });
 
-# إعداد الصفحة
-st.set_page_config(layout="wide", page_title="Smart Ads Builder")
-
-# إعداد Gemini (تأكدي من وضع المفتاح في Secrets)
-api_key = st.secrets.get("GEMINI_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-pro')
-else:
-    st.error("⚠️ يرجى إضافة GEMINI_API_KEY في Secrets!")
-
-# قراءة ملف الـ HTML
-try:
-    with open("index.html", "r", encoding="utf-8") as f:
-        html_data = f.read()
-    
-    # عرض التصميم
-    # زِدنا الـ height لـ 1500 عشان تصميمك طويل وفيه مربعات كتير
-    components.html(html_data, height=1500, scrolling=True)
-except Exception as e:
-    st.error(f"خطأ في تحميل التصميم: {e}")
+    // استقبال النتائج من Gemini وعرضها
+    window.addEventListener('message', (event) => {
+        if (event.data.type === 'streamlit:render') {
+            const aiData = event.data.args.ai_output;
+            if (aiData) {
+                const res = JSON.parse(aiData);
+                document.getElementById('primaryKeywords').innerHTML = res.primaryKeywords.map(k => `<span class="keyword">${k}</span>`).join('');
+                document.getElementById('slogans').innerHTML = res.slogans.map(s => `<div class="result-item">${s}</div>`).join('');
+                btn.innerText = "✨ Generate Strategy";
+            }
+        }
+    });
   </script>
 </body>
 </html>
