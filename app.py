@@ -6,34 +6,77 @@ st.set_page_config(layout="wide", page_title="Professional Content Builder")
 
 st.markdown("""
 <style>
-.main { background-color: #0f172a; }
-.stTextInput>div>div>input, .stSelectbox>div>div>select, .stTextArea>div>div>textarea {
-    background-color: #1e293b;
-    color: white;
-    border-radius: 8px;
-    border: 1px solid #334155;
+.main {
+    background-color: #0f172a;
 }
-.stButton>button {
+
+/* General text */
+html, body, [class*="css"] {
+    color: #f8fafc;
+}
+
+/* Labels */
+label, .stTextInput label, .stSelectbox label, .stTextArea label {
+    color: #e2e8f0 !important;
+    font-weight: 600 !important;
+}
+
+/* Inputs */
+.stTextInput input,
+.stTextArea textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-radius: 10px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Select boxes */
+.stSelectbox div[data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-radius: 10px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Placeholder text */
+input::placeholder,
+textarea::placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
+}
+
+/* Button */
+.stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #7c3aed, #06b6d4);
     color: white;
     border: none;
     padding: 12px;
     font-weight: bold;
-    border-radius: 8px;
+    border-radius: 10px;
 }
+
+/* Result cards */
 .info-card {
     background: #1e293b;
+    color: #f8fafc;
     padding: 15px;
     border-radius: 10px;
     border-left: 4px solid #06b6d4;
     margin-bottom: 10px;
 }
+
 .small-card {
     background: #1e293b;
+    color: #f8fafc;
     padding: 12px;
     border-radius: 10px;
     margin-bottom: 8px;
+}
+
+/* Success/info */
+.stAlert {
+    border-radius: 10px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -61,8 +104,7 @@ def get_country_tone(country: str, lang: str) -> str:
         if country == "Sudan":
             return "Write in Arabic with a Sudan-friendly marketing tone. Keep it warm, simple, and relatable."
         return "Write in clear modern Arabic with a strong marketing tone."
-    else:
-        return "Write in polished marketing English adapted to the target country and audience."
+    return "Write in polished marketing English adapted to the target country and audience."
 
 
 def extract_json(text: str) -> dict:
@@ -197,26 +239,8 @@ Return this exact JSON structure:
                     st.subheader("📣 Short Headlines")
                     for h in res["short_headlines"]:
                         st.markdown(
-                           st.markdown("""
-<style>
-
-.main {
-    background-color: #0f172a;
-}
-
-/* Labels */
-label {
-    color: #f1f5f9 !important;
-    font-weight: 600;
-}
-
-/* Inputs */
-.stTextInput input,
-.stSelectbox div[data-baseweb="select"],
-.stTextArea textarea {
-
-    background-color: #ffffff !important;
-    color
+                            f'<div class="info-card">{h}</div>',
+                            unsafe_allow_html=True
                         )
 
                     st.subheader("📢 Long Headlines")
