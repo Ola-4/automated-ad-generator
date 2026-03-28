@@ -2,145 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Ads Builder</title>
     <style>
-        * { box-sizing: border-box; transition: all 0.2s ease; }
-        body { 
-            margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #0f172a; color: white; min-height: 100vh;
-        }
-        .page { width: 100%; max-width: 98%; margin: 0 auto; padding: 20px; }
-        .container { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
-        
-        .card { 
-            background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; 
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-        }
-        label { display: block; margin: 15px 0 8px; color: #94a3b8; font-weight: 600; font-size: 14px; }
-        input, select, textarea { 
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; 
-            background: #1e293b; color: white; outline: none; font-size: 14px;
-        }
-        
-        .primary-btn { 
-            width: 100%; margin-top: 25px; padding: 15px; border-radius: 10px; 
-            background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; 
-            border: none; font-weight: bold; cursor: pointer; font-size: 16px;
-        }
-        .primary-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        .primary-btn:disabled { background: #475569; cursor: not-allowed; transform: none; opacity: 0.6; }
-
-        .outputs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .res-box { min-height: 250px; border-top: 4px solid #7c3aed; position: relative; }
-        h3 { margin-top: 0; color: #f8fafc; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        
-        .tag { background: rgba(124, 58, 237, 0.2); color: #c4b5fd; padding: 6px 14px; border-radius: 20px; margin: 5px; display: inline-block; font-size: 13px; border: 1px solid rgba(124, 58, 237, 0.3); }
-        .list-item { border-left: 3px solid #06b6d4; padding: 12px; margin-bottom: 10px; background: rgba(255,255,255,0.03); border-radius: 4px; line-height: 1.6; }
-        [dir="rtl"] .list-item { border-left: none; border-right: 3px solid #06b6d4; }
+        body { background: #0f172a; color: white; font-family: sans-serif; padding: 20px; }
+        .grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+        input, select, textarea { width: 100%; margin: 10px 0; padding: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px; }
+        button { width: 100%; padding: 15px; background: #7c3aed; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .res-item { background: #1e293b; padding: 15px; border-top: 4px solid #7c3aed; border-radius: 5px; min-height: 150px; }
+        .tag { background: #7c3aed; padding: 4px 10px; border-radius: 15px; margin: 3px; display: inline-block; font-size: 12px; }
     </style>
 </head>
 <body>
-    <div class="page">
-        <div class="container">
-            <aside class="card">
-                <label id="lblProject">Project Name</label>
-                <input id="projectName" type="text" placeholder="Hakaweena...">
-                
-                <label id="lblLanguage">Language</label>
-                <select id="language" onchange="updateUI(this.value)">
-                    <option value="en">English</option>
-                    <option value="ar">العربية</option>
-                </select>
-
-                <label id="lblCountry">Target Country</label>
-                <select id="country">
-                    <option value="Sudan">Sudan 🇸🇩</option>
-                    <option value="Egypt">Egypt 🇪🇬</option>
-                    <option value="Saudi Arabia">Saudi Arabia 🇸🇦</option>
-                    <option value="UAE">UAE 🇦🇪</option>
-                </select>
-
-                <label id="lblIndustry">Industry</label>
-                <select id="industry">
-                    <option value="Podcast">Podcast / بودكاست</option>
-                    <option value="Cooking">Cooking / طبخ</option>
-                    <option value="SaaS">SaaS / برمجيات</option>
-                    <option value="Real Estate">Real Estate / عقارات</option>
-                    <option value="E-commerce">E-commerce / تجارة إلكترونية</option>
-                    <option value="Technology">Technology / تقنية</option>
-                </select>
-
-                <label id="lblAudience">Target Audience</label>
-                <textarea id="audience" rows="4"></textarea>
-                
-                <button class="primary-btn" id="generateBtn">✨ Generate Content</button>
-            </aside>
-
-            <main class="outputs">
-                <div class="card res-box"> <h3 id="hSEO">🔎 SEO Keywords</h3> <div id="primaryKeywords"></div> </div>
-                <div class="card res-box"> <h3 id="hSlogans">✨ Slogans</h3> <div id="slogans"></div> </div>
-                <div class="card res-box"> <h3 id="hHeadlines">📣 Headlines</h3> <div id="shortHeadlines"></div> </div>
-                <div class="card res-box"> <h3 id="hDesc">📝 Descriptions</h3> <div id="descriptions"></div> </div>
-            </main>
+    <div class="grid">
+        <div class="card">
+            <h3>Settings</h3>
+            <input id="pName" placeholder="Project Name">
+            <select id="lang" onchange="document.body.dir = (this.value=='ar'?'rtl':'ltr')">
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+            </select>
+            <select id="ind">
+                <option value="Podcast">Podcast / بودكاست</option>
+                <option value="Cooking">Cooking / طبخ</option>
+                <option value="SaaS">Software / برمجيات</option>
+            </select>
+            <textarea id="aud" rows="3" placeholder="Target Audience"></textarea>
+            <button id="btn">✨ Generate Now</button>
+        </div>
+        <div class="res-grid">
+            <div class="res-item"><h4>Keywords</h4><div id="k"></div></div>
+            <div class="res-item"><h4>Slogans</h4><div id="s"></div></div>
+            <div class="res-item"><h4>Headlines</h4><div id="h"></div></div>
+            <div class="res-item"><h4>Descriptions</h4><div id="d"></div></div>
         </div>
     </div>
-
     <script>
-        const translations = {
-            en: { project: "Project Name", lang: "Language", country: "Country", ind: "Industry", aud: "Audience", btn: "✨ Generate Content", seo: "🔎 SEO Keywords", slo: "✨ Slogans", head: "📣 Headlines", desc: "📝 Descriptions", dir: "ltr" },
-            ar: { project: "اسم المشروع", lang: "اللغة", country: "الدولة المستهدفة", ind: "المجال", aud: "الجمهور المستهدف", btn: "✨ توليد المحتوى", seo: "🔎 كلمات البحث", slo: "✨ الشعارات", head: "📣 العناوين", desc: "📝 الأوصاف", dir: "rtl" }
+        document.getElementById('btn').onclick = function() {
+            const val = document.getElementById('pName').value.trim();
+            if(!val) return alert("Enter Name!");
+            this.innerText = "...Loading";
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: {
+                project: val, industry: document.getElementById('ind').value,
+                language: document.getElementById('lang').value, country: 'Sudan',
+                audience: document.getElementById('aud').value
+            }}, '*');
         };
-
-        function updateUI(lang) {
-            const t = translations[lang];
-            document.getElementById('lblProject').innerText = t.project;
-            document.getElementById('lblLanguage').innerText = t.lang;
-            document.getElementById('lblCountry').innerText = t.country;
-            document.getElementById('lblIndustry').innerText = t.ind;
-            document.getElementById('lblAudience').innerText = t.aud;
-            document.getElementById('generateBtn').innerText = t.btn;
-            document.getElementById('hSEO').innerText = t.seo;
-            document.getElementById('hSlogans').innerText = t.slo;
-            document.getElementById('hHeadlines').innerText = t.head;
-            document.getElementById('hDesc').innerText = t.desc;
-            document.body.style.direction = t.dir;
-        }
-
-        document.getElementById('generateBtn').addEventListener('click', function() {
-            const pInput = document.getElementById('projectName');
-            // التصحيح هنا: استخدام .trim() بدلاً من .strip()
-            const pName = pInput.value.trim();
-            
-            if(!pName) {
-                alert(document.body.style.direction === 'rtl' ? "الرجاء إدخال اسم المشروع" : "Please enter Project Name");
-                return;
-            }
-
-            this.innerText = (document.body.style.direction === 'rtl' ? "...جاري المعالجة" : "...Processing");
-            this.disabled = true;
-
-            const payload = {
-                project: pName,
-                industry: document.getElementById('industry').value,
-                language: document.getElementById('language').value,
-                country: document.getElementById('country').value,
-                audience: document.getElementById('audience').value
-            };
-
-            window.parent.postMessage({type: 'streamlit:setComponentValue', value: payload}, '*');
-        });
 
         /*AI_DATA_PLACEHOLDER*/
         if (typeof ai_output !== 'undefined' && ai_output) {
-            document.getElementById('primaryKeywords').innerHTML = ai_output.primaryKeywords.map(k => `<span class="tag">${k}</span>`).join('');
-            document.getElementById('slogans').innerHTML = ai_output.slogans.map(s => `<div class="list-item">${s}</div>`).join('');
-            document.getElementById('shortHeadlines').innerHTML = ai_output.shortHeadlines.map(h => `<div class="list-item">${h}</div>`).join('');
-            document.getElementById('descriptions').innerHTML = ai_output.descriptions.map(d => `<div class="list-item">${d}</div>`).join('');
-            
-            const btn = document.getElementById('generateBtn');
-            btn.disabled = false;
-            btn.innerText = translations[document.getElementById('language').value].btn;
+            document.getElementById('k').innerHTML = ai_output.primaryKeywords.map(i => `<span class="tag">${i}</span>`).join('');
+            document.getElementById('s').innerHTML = ai_output.slogans.map(i => `<div>• ${i}</div>`).join('<br>');
+            document.getElementById('h').innerHTML = ai_output.shortHeadlines.map(i => `<div>• ${i}</div>`).join('<br>');
+            document.getElementById('d').innerHTML = ai_output.descriptions.map(i => `<div>• ${i}</div>`).join('<br>');
         }
     </script>
 </body>
