@@ -5,7 +5,7 @@ import json
 
 st.set_page_config(layout="wide", page_title="Smart Ads Builder")
 
-# 1. تهيئة الذاكرة (Session State)
+# 1. تهيئة الذاكرة (Session State) لحفظ النتائج بين التحديثات
 if 'ai_results' not in st.session_state:
     st.session_state.ai_results = None
 
@@ -20,9 +20,12 @@ def get_ai_content(data):
         return None
     
     prompt = f"""
-    Create a marketing strategy for: Project: {data['project']}, Industry: {data['industry']}, 
+    Act as a Senior Content Developer. 
+    Project: {data['project']}, Industry: {data['industry']}, 
     Country: {data['country']}, Language: {data['language']}.
-    Return ONLY a JSON object with: primaryKeywords, slogans, shortHeadlines, descriptions.
+    Target Audience: {data.get('audience', 'General')}.
+    
+    Return ONLY a JSON object with keys: primaryKeywords, slogans, shortHeadlines, descriptions.
     """
     try:
         response = model.generate_content(prompt)
@@ -34,18 +37,19 @@ def get_ai_content(data):
 with open("index.html", "r", encoding="utf-8") as f:
     html_code = f.read()
 
-# 3. إذا كان عندنا نتائج قديمة في الذاكرة، نحقنها في الـ HTML قبل العرض
+# 3. "الحقن المسبق": إذا عندنا نتائج في الذاكرة، نضعها في الكود قبل العرض
 current_html = html_code
 if st.session_state.ai_results:
     current_html = html_code.replace("/*AI_DATA_PLACEHOLDER*/", f"const ai_output = {st.session_state.ai_results};")
 
-# 4. عرض الواجهة
+# 4. عرض الواجهة (باستخدام الكود المحقون بالنتائج إن وجد)
 user_input = components.html(current_html, height=1200, scrolling=True)
 
-# 5. معالجة الضغطة الجديدة
+# 5. معالجة البيانات الجديدة عند ضغط الزر
 if user_input and isinstance(user_input, dict) and user_input.get('project'):
-    # نتأكد إننا مش بنعيد نفس الطلب لو النتائج موجودة فعلاً
-    res = get_ai_content(user_input)
-    if res:
-        st.session_state.ai_results = res
-        st.rerun() # إعادة تشغيل الصفحة فوراً لحقن النتائج الجديدة
+    # منع التكرار: لا نطلب من AI إذا كانت النتيجة لنفس المشروع موجودة فعلاً
+    with st.spinner("AI is crafting your results..."):
+        res = get_ai_content(user_input)
+        if res:
+            st.session_state.ai_results = res
+            st.rerun() # إعادة تشغيل الصفحة فوراً لحقن النتائج وعرضها
