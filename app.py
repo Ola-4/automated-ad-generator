@@ -4,14 +4,15 @@ from google import genai
 
 st.set_page_config(layout="wide", page_title="Professional Content Builder")
 
+# تعديل الألوان لتكون فاتحة وواضحة (Light Mode)
 st.markdown("""
 <style>
-.main { background-color: #0f172a; }
+.main { background-color: #ffffff; color: #1e293b; }
 .stTextInput>div>div>input, .stSelectbox>div>div>select, .stTextArea>div>div>textarea {
-    background-color: #1e293b;
-    color: white;
+    background-color: #f8fafc;
+    color: #1e293b;
     border-radius: 8px;
-    border: 1px solid #334155;
+    border: 1px solid #cbd5e1;
 }
 .stButton>button {
     width: 100%;
@@ -23,11 +24,19 @@ st.markdown("""
     border-radius: 8px;
 }
 .info-card {
-    background: #1e293b;
+    background: #f1f5f9;
     padding: 15px;
     border-radius: 10px;
-    border-left: 4px solid #06b6d4;
+    border-left: 4px solid #7c3aed;
     margin-bottom: 10px;
+    color: #1e293b;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
+}
+/* تنسيق العناوين الفرعية لتكون واضحة */
+h1, h2, h3, .stSubheader {
+    color: #1e293b !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -57,9 +66,10 @@ with st.container():
         )
 
     with col2:
+        # إضافة الدول المطلوبة للقائمة
         target_country = st.selectbox(
             "الدولة المستهدفة",
-            ["Sudan", "Saudi Arabia", "UAE", "Egypt", "Global"]
+            ["Sudan", "Saudi Arabia", "Egypt", "UAE", "Global"]
         )
         lang = st.selectbox("اللغة", ["العربية", "English"])
 
@@ -102,7 +112,7 @@ Return ONLY valid JSON with this exact structure:
         with st.spinner("جاري تحليل البيانات وتوليد المحتوى..."):
             try:
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-2.0-flash", # تم تعديل اسم الموديل للأكثر استقراراً
                     contents=prompt,
                 )
 
