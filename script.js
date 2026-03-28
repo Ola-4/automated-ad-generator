@@ -33,30 +33,43 @@ function updateDirection(language) {
   }
 }
 
-function parseSeedKeywords(seedText) {
-  return seedText
-    .split(",")
-    .map(item => item.trim())
-    .filter(Boolean);
+function renderList(elementId, items, className) {
+  const container = document.getElementById(elementId);
+  if (!container) return;
+  if (!items || !items.length) {
+    container.innerHTML = `<div class="empty">No results yet.</div>`;
+    return;
+  }
+  container.innerHTML = items.map(item => {
+    if (className === "keyword") {
+      return `<span class="${className}">${item}</span>`;
+    }
+    return `<div class="${className}">${item}</div>`;
+  }).join("");
 }
 
-function uniqueList(items) {
-  return [...new Set(items.filter(Boolean))];
+function normalizeArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return [value];
 }
 
-// --- الدالة الأساسية بعد التعديل للربط بـ Gemini ---
 async function generateResults() {
   const language = document.getElementById("language").value;
   const project = document.getElementById("projectName").value.trim();
   const service = document.getElementById("service").value.trim();
-  const location = document.getElementById("location").value.trim();
+  const country = document.getElementById("country").value.trim();
   const industry = document.getElementById("industry").value.trim();
   const audience = document.getElementById("audience").value.trim();
-  const seeds = document.getElementById("seedKeywords").value;
+  const seeds = document.getElementById("seedKeywords").value.trim();
   const url = document.getElementById("url").value.trim();
 
-  if (!project || !service) {
-    showToast(language === "ar" ? "يرجى إدخال اسم المشروع والوصف" : "Please enter project name and description");
+  if (!project || !service || !country || !industry) {
+    showToast(
+      language === "ar"
+        ? "يرجى إدخال اسم المشروع، الخدمة، الدولة، والمجال"
+        : "Please enter project name, service, country, and industry"
+    );
     return;
   }
 
@@ -64,58 +77,67 @@ async function generateResults() {
   updateDirection(language);
 
   try {
-    // إرسال البيانات إلى Flask (app.py)
-    const response = await fetch('/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        language, project, service, location, industry, audience, seeds, url
+        language,
+        project,
+        service,
+        country,
+        industry,
+        audience,
+        seeds,
+        url,
+        domain: extractDomain(url)
       })
     });
 
     const data = await response.json();
 
-    if (data.success) {
-      const res = data.data; // البيانات القادمة من Gemini
-
-      // توزيع النتائج على المربعات في تصميمك
-      renderList("primaryKeywords", res.primaryKeywords, "keyword");
-      renderList("supportingKeywords", res.supportingKeywords, "keyword");
-      renderList("slogans", res.slogans, "result-item");
-      renderList("shortHeadlines", res.shortHeadlines, "result-item");
-      renderList("longHeadlines", res.longHeadlines, "result-item");
-      renderList("descriptions", res.descriptions, "result-item");
-      renderList("contentIdeas", res.contentIdeas, "result-item");
-      
-      // تحديث أزرار الـ CTA
-      document.getElementById("ctaButtons").innerHTML = 
-        res.ctas.map(c => `<span class="cta">${c}</span>`).join("");
-
-      // تحديث الإحصائيات في التصميم
-      document.getElementById("statProject").textContent = project || "—";
-      document.getElementById("statIndustry").textContent = industry || "—";
-      document.getElementById("statLocation").textContent = location || "—";
-
-      showToast(language === "ar" ? "تم التوليد بذكاء" : "Generated with AI");
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "AI generation failed");
     }
+
+    const res = data.data || {};
+
+    renderList("primaryKeywords", normalizeArray(res.primaryKeywords), "keyword");
+    renderList("supportingKeywords", normalizeArray(res.supportingKeywords), "keyword");
+    renderList("slogans", normalizeArray(res.slogans), "result-item");
+    renderList("shortHeadlines", normalizeArray(res.shortHeadlines), "result-item");
+    renderList("longHeadlines", normalizeArray(res.longHeadlines), "result-item");
+    renderList("descriptions", normalizeArray(res.descriptions), "result-item");
+    renderList("contentIdeas", normalizeArray(res.contentIdeas), "result-item");
+
+    const ctas = normalizeArray(res.ctas);
+    document.getElementById("ctaButtons").innerHTML =
+      ctas.length
+        ? ctas.map(c => `<span class="cta">${c}</span>`).join("")
+        : `<div class="empty">No CTA suggestions yet.</div>`;
+
+    document.getElementById("statProject").textContent = project || "—";
+    document.getElementById("statIndustry").textContent = industry || "—";
+    document.getElementById("statCountry").textContent = country || "—";
+
+    showToast(language === "ar" ? "تم التوليد بنجاح" : "Generated successfully");
   } catch (error) {
     console.error("AI Error:", error);
-    showToast("Error connecting to AI server");
+    showToast(language === "ar" ? "حدث خطأ في الاتصال بالسيرفر" : "Error connecting to AI server");
   } finally {
     hideLoader();
   }
 }
 
-// دالة مساعدة لعرض القوائم بنفس ستايلك
-function renderList(elementId, items, className) {
-  const container = document.getElementById(elementId);
-  if (container && items) {
-    container.innerHTML = items.map(item => `<div class="${className}">${item}</div>`).join("");
-  }
-}
-
 function copyContent(id) {
-  const text = document.getElementById(id).innerText;
+  const element = document.getElementById(id);
+  if (!element) return;
+  const text = element.innerText.trim();
+  if (!text) {
+    showToast("Nothing to copy");
+    return;
+  }
   navigator.clipboard.writeText(text);
   showToast("Copied");
 }
@@ -123,9 +145,24 @@ function copyContent(id) {
 function resetResults() {
   document.getElementById("projectName").value = "";
   document.getElementById("service").value = "";
-  document.getElementById("location").value = "";
+  document.getElementById("country").value = "";
   document.getElementById("industry").value = "";
   document.getElementById("audience").value = "";
   document.getElementById("seedKeywords").value = "";
   document.getElementById("url").value = "";
+
+  document.getElementById("statProject").textContent = "—";
+  document.getElementById("statIndustry").textContent = "—";
+  document.getElementById("statCountry").textContent = "—";
+
+  renderList("primaryKeywords", [], "keyword");
+  renderList("supportingKeywords", [], "keyword");
+  renderList("slogans", [], "result-item");
+  renderList("shortHeadlines", [], "result-item");
+  renderList("longHeadlines", [], "result-item");
+  renderList("descriptions", [], "result-item");
+  renderList("contentIdeas", [], "result-item");
+  document.getElementById("ctaButtons").innerHTML = `<div class="empty">No CTA suggestions yet.</div>`;
 }
+
+resetResults();
