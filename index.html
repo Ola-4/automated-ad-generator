@@ -2,50 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Ads Builder</title>
     <style>
         * { box-sizing: border-box; }
-        body {
-            margin: 0; font-family: 'Segoe UI', sans-serif;
-            background: #0f172a; color: white; min-height: 100vh;
-        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; transition: 0.3s; }
         .page { width: 100%; max-width: 98%; margin: 0 auto; padding: 20px; }
-        .hero {
-            background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-        }
         .container { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
-        .card { background: rgba(255,255,255,0.07); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        label { display: block; margin: 15px 0 5px; color: #94a3b8; }
-        input, select, textarea {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155;
-            background: #1e293b; color: white; outline: none;
-        }
-        .primary-btn {
-            width: 100%; margin-top: 20px; padding: 15px; border-radius: 10px;
-            background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white;
-            border: none; font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        label { display: block; margin: 15px 0 5px; color: #94a3b8; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #1e293b; color: white; outline: none; margin-bottom: 10px; }
+        .primary-btn { width: 100%; padding: 15px; border-radius: 10px; background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; border: none; font-weight: bold; cursor: pointer; }
         .outputs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .res-box { min-height: 150px; }
+        .res-box { min-height: 200px; border-top: 4px solid #7c3aed; }
         .tag { background: #7c3aed; padding: 5px 12px; border-radius: 20px; margin: 4px; display: inline-block; font-size: 13px; }
-        .list-item { border-left: 3px solid #06b6d4; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border-radius: 5px; }
+        .list-item { border-left: 3px solid #06b6d4; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.03); }
+        [dir="rtl"] .list-item { border-left: none; border-right: 3px solid #06b6d4; }
     </style>
 </head>
 <body>
     <div class="page">
-        <header class="hero">
-            <div><h1 id="mainTitle">Smart Ads & SEO Builder</h1></div>
-            <div style="background:#7c3aed; padding:8px 15px; border-radius:30px; font-weight:bold;">Ola Osman • Senior Developer</div>
-        </header>
-
         <div class="container">
             <aside class="card">
                 <label id="lblProject">Project Name</label>
-                <input id="projectName" type="text" placeholder="Hajja Portal...">
+                <input id="projectName" type="text" placeholder="...">
                 
-                <label id="lblLanguage">Interface Language</label>
+                <label id="lblLanguage">Language</label>
                 <select id="language" onchange="updateUI(this.value)">
                     <option value="en">English</option>
                     <option value="ar">العربية</option>
@@ -61,7 +42,13 @@
 
                 <label id="lblIndustry">Industry</label>
                 <select id="industry">
-                    <option>Technology</option><option>Education</option><option>Podcast</option>
+                    <option value="Technology">Technology / تقنية</option>
+                    <option value="Cooking">Cooking / طبخ</option>
+                    <option value="SaaS">SaaS / برمجيات</option>
+                    <option value="Real Estate">Real Estate / عقارات</option>
+                    <option value="E-commerce">E-commerce / تجارة إلكترونية</option>
+                    <option value="Education">Education / تعليم</option>
+                    <option value="Podcast">Podcast / بودكاست</option>
                 </select>
 
                 <label id="lblAudience">Target Audience</label>
@@ -81,25 +68,27 @@
 
     <script>
         const translations = {
-            en: { title: "Smart Ads & SEO Builder", project: "Project Name", lang: "Interface Language", country: "Target Country", ind: "Industry", aud: "Target Audience", btn: "✨ Generate Content", dir: "ltr" },
-            ar: { title: "صانع الإعلانات والـ SEO", project: "اسم المشروع", lang: "لغة الواجهة", country: "الدولة المستهدفة", ind: "المجال", aud: "الجمهور المستهدف", btn: "✨ توليد المحتوى", dir: "rtl" }
+            en: { project: "Project Name", lang: "Language", country: "Country", ind: "Industry", aud: "Audience", btn: "✨ Generate Content", seo: "🔎 SEO Keywords", slo: "✨ Slogans", head: "📣 Headlines", desc: "📝 Descriptions", dir: "ltr" },
+            ar: { project: "اسم المشروع", lang: "اللغة", country: "الدولة المستهدفة", ind: "المجال", aud: "الجمهور المستهدف", btn: "✨ توليد المحتوى", seo: "🔎 كلمات البحث", slo: "✨ الشعارات", head: "📣 العناوين", desc: "📝 الأوصاف التسويقية", dir: "rtl" }
         };
 
         function updateUI(lang) {
             const t = translations[lang];
-            document.getElementById('mainTitle').innerText = t.title;
             document.getElementById('lblProject').innerText = t.project;
             document.getElementById('lblLanguage').innerText = t.lang;
             document.getElementById('lblCountry').innerText = t.country;
             document.getElementById('lblIndustry').innerText = t.ind;
             document.getElementById('lblAudience').innerText = t.aud;
             document.getElementById('generateBtn').innerText = t.btn;
+            document.getElementById('hSEO').innerText = t.seo;
+            document.getElementById('hSlogans').innerText = t.slo;
+            document.getElementById('hHeadlines').innerText = t.head;
+            document.getElementById('hDesc').innerText = t.desc;
             document.body.style.direction = t.dir;
         }
 
         document.getElementById('generateBtn').addEventListener('click', () => {
-            const btn = document.getElementById('generateBtn');
-            btn.innerText = "Processing..."; btn.style.opacity = "0.5";
+            document.getElementById('generateBtn').innerText = "...Processing";
             const data = {
                 project: document.getElementById('projectName').value,
                 industry: document.getElementById('industry').value,
@@ -112,11 +101,11 @@
 
         /*AI_DATA_PLACEHOLDER*/
         if (typeof ai_output !== 'undefined') {
-            const res = ai_output;
-            document.getElementById('primaryKeywords').innerHTML = res.primaryKeywords.map(k => `<span class="tag">${k}</span>`).join('');
-            document.getElementById('slogans').innerHTML = res.slogans.map(s => `<div class="list-item">${s}</div>`).join('');
-            document.getElementById('shortHeadlines').innerHTML = res.shortHeadlines.map(h => `<div class="list-item">${h}</div>`).join('');
-            document.getElementById('descriptions').innerHTML = res.descriptions.map(d => `<div class="list-item">${d}</div>`).join('');
+            document.getElementById('primaryKeywords').innerHTML = ai_output.primaryKeywords.map(k => `<span class="tag">${k}</span>`).join('');
+            document.getElementById('slogans').innerHTML = ai_output.slogans.map(s => `<div class="list-item">${s}</div>`).join('');
+            document.getElementById('shortHeadlines').innerHTML = ai_output.shortHeadlines.map(h => `<div class="list-item">${h}</div>`).join('');
+            document.getElementById('descriptions').innerHTML = ai_output.descriptions.map(d => `<div class="list-item">${d}</div>`).join('');
+            document.getElementById('generateBtn').innerText = "✨ Generate Content";
         }
     </script>
 </body>
