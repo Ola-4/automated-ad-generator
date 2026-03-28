@@ -1,82 +1,140 @@
-import streamlit as st
-import google.generativeai as genai
 import json
+import streamlit as st
+from google import genai
 
-# 1. إعداد الصفحة وتنسيقها لتكون مريحة للعين
-st.set_page_config(layout="wide", page_title="AI Content Strategist")
+st.set_page_config(layout="wide", page_title="Professional Content Builder")
 
 st.markdown("""
-    <style>
-    .stApp { background-color: #0f172a; color: white; }
-    .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>select {
-        background-color: #1e293b !important; color: white !important; border: 1px solid #334155 !important;
-    }
-    .stButton>button {
-        width: 100%; background: linear-gradient(90deg, #7c3aed, #06b6d4);
-        color: white; border: none; padding: 15px; font-weight: bold; border-radius: 10px;
-    }
-    .result-card { background: #1e293b; padding: 15px; border-radius: 10px; border-left: 5px solid #7c3aed; margin-bottom: 15px; }
-    </style>
-    """, unsafe_allow_html=True)
+<style>
+.main { background-color: #0f172a; }
+.stTextInput>div>div>input, .stSelectbox>div>div>select, .stTextArea>div>div>textarea {
+    background-color: #1e293b;
+    color: white;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+.stButton>button {
+    width: 100%;
+    background: linear-gradient(90deg, #7c3aed, #06b6d4);
+    color: white;
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+}
+.info-card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #06b6d4;
+    margin-bottom: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
 
-st.title("🚀 محرك صناعة المحتوى و SEO")
-st.info("أدخلي بيانات أي مشروع للحصول على خطة محتوى فورية.")
+st.title("🚀 محرك صناعة المحتوى الذكي")
+st.write("أداة احترافية لتوليد خطط المحتوى، SEO، والشعارات لأي مشروع.")
 
-# 2. إعداد Gemini (تأكدي من وجود المفتاح في Secrets)
 api_key = st.secrets.get("GEMINI_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-pro')
 
-# 3. واجهة المدخلات (مباشرة وبدون تعقيد HTML)
+if not api_key:
+    st.error("GEMINI_API_KEY is missing from Streamlit secrets.")
+    st.stop()
+
+client = genai.Client(api_key=api_key)
+
 with st.container():
     col1, col2 = st.columns(2)
+
     with col1:
-        p_name = st.text_input("اسم المشروع", placeholder="مثلاً: هكاوينا أو مشروع جديد...")
-        industry = st.selectbox("المجال", ["بودكاست", "تقنية", "عقارات", "طبخ", "تعليم", "تجارة إلكترونية"])
+        p_name = st.text_input(
+            "اسم المشروع / العلامة التجارية",
+            placeholder="أدخلي اسم المشروع هنا..."
+        )
+        industry = st.selectbox(
+            "مجال العمل",
+            ["بودكاست", "تقنية/SaaS", "عقارات", "طبخ/أغذية", "تعليم", "تجارة إلكترونية", "أخرى"]
+        )
+
     with col2:
+        target_country = st.selectbox(
+            "الدولة المستهدفة",
+            ["Sudan", "Saudi Arabia", "UAE", "Egypt", "Global"]
+        )
         lang = st.selectbox("اللغة", ["العربية", "English"])
-        country = st.text_input("الدولة المستهدفة", value="Sudan")
 
-    audience = st.text_area("الجمهور المستهدف", placeholder="اوصفي جمهورك هنا...")
-    
-    generate = st.button("توليد المحتوى ✨")
+    audience = st.text_area(
+        "تفاصيل الجمهور المستهدف (Target Audience)",
+        placeholder="مثلاً: الشباب المهتمين بالثقافة، أو أصحاب الشركات الناشئة..."
+    )
 
-# 4. معالجة البيانات وعرضها
+    generate = st.button("توليد الخطة التسويقية ✨")
+
+def extract_json(text: str) -> dict:
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.replace("```json", "").replace("```", "").strip()
+    return json.loads(text)
+
 if generate:
     if not p_name:
-        st.error("لازم تكتبي اسم المشروع يا علا!")
+        st.warning("الرجاء إدخال اسم المشروع للمتابعة.")
     else:
-        with st.spinner("⏳ جاري استخراج النتائج..."):
-            prompt = f"""
-            Act as a Senior SEO Specialist. Project: {p_name}, Industry: {industry}, Language: {lang}.
-            Target Audience: {audience}.
-            Return ONLY a JSON object with: 
-            "k": ["5 keywords"], "s": ["3 slogans"], "h": ["3 headlines"], "d": ["2 descriptions"].
-            """
+        prompt = f"""
+Act as a Senior SEO & Content Strategist.
+
+Create a data-driven content plan for:
+Project: {p_name}
+Industry: {industry}
+Country: {target_country}
+Language: {lang}
+Target Audience: {audience}
+
+Return ONLY valid JSON with this exact structure:
+{{
+  "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"],
+  "slogans": ["slogan 1", "slogan 2", "slogan 3"],
+  "headlines": ["headline 1", "headline 2", "headline 3"],
+  "descriptions": ["description 1", "description 2"]
+}}
+"""
+
+        with st.spinner("جاري تحليل البيانات وتوليد المحتوى..."):
             try:
-                response = model.generate_content(prompt)
-                res = json.loads(response.text.replace('```json', '').replace('```', '').strip())
-                
-                st.divider()
-                st.success(f"نتائج مشروع: {p_name}")
-                
-                # عرض النتائج في تبويبات واضحة
-                tab1, tab2, tab3 = st.tabs(["🔎 SEO & Keywords", "✨ الشعارات", "📣 العناوين والأوصاف"])
-                
-                with tab1:
-                    st.write("### كلمات البحث المستهدفة")
-                    st.write(", ".join(res['k']))
-                
-                with tab2:
-                    for s in res['s']:
-                        st.markdown(f'<div class="result-card">{s}</div>', unsafe_allow_html=True)
-                
-                with tab3:
-                    for h in res['h']:
-                        st.write(f"**العنوان:** {h}")
-                    st.divider()
-                    for d in res['d']:
-                        st.info(f"وصف SEO: {d}")
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt,
+                )
+
+                raw_text = response.text
+                res = extract_json(raw_text)
+
+                st.success(f"تم تجهيز الخطة لمشروع: {p_name}")
+
+                res_col1, res_col2 = st.columns(2)
+
+                with res_col1:
+                    st.subheader("🔎 SEO & Keywords")
+                    st.write(", ".join(res["keywords"]))
+
+                    st.subheader("✨ Slogans")
+                    for s in res["slogans"]:
+                        st.markdown(
+                            f'<div class="info-card">{s}</div>',
+                            unsafe_allow_html=True
+                        )
+
+                with res_col2:
+                    st.subheader("📣 Headlines")
+                    for h in res["headlines"]:
+                        st.markdown(
+                            f'<div class="info-card">{h}</div>',
+                            unsafe_allow_html=True
+                        )
+
+                    st.subheader("📝 Meta Descriptions")
+                    for d in res["descriptions"]:
+                        st.info(d)
+
             except Exception as e:
-                st.error("حصلت مشكلة في الاتصال بالذكاء الاصطناعي. اتأكدي إن الـ API Key صحيحة.")
+                st.error(f"حدث خطأ: {e}")
