@@ -13,7 +13,6 @@
         .page { width: 100%; max-width: 98%; margin: 0 auto; padding: 20px; }
         .container { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
         
-        /* Sidebar Styling */
         .card { 
             background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; 
             border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
@@ -23,7 +22,6 @@
             width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; 
             background: #1e293b; color: white; outline: none; font-size: 14px;
         }
-        input:focus, select:focus, textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2); }
         
         .primary-btn { 
             width: 100%; margin-top: 25px; padding: 15px; border-radius: 10px; 
@@ -31,18 +29,14 @@
             border: none; font-weight: bold; cursor: pointer; font-size: 16px;
         }
         .primary-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        .primary-btn:disabled { background: #475569; cursor: not-allowed; transform: none; }
+        .primary-btn:disabled { background: #475569; cursor: not-allowed; transform: none; opacity: 0.6; }
 
-        /* Results Area */
         .outputs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .res-box { min-height: 250px; border-top: 4px solid #7c3aed; position: relative; }
         h3 { margin-top: 0; color: #f8fafc; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         
-        /* Content Items */
         .tag { background: rgba(124, 58, 237, 0.2); color: #c4b5fd; padding: 6px 14px; border-radius: 20px; margin: 5px; display: inline-block; font-size: 13px; border: 1px solid rgba(124, 58, 237, 0.3); }
         .list-item { border-left: 3px solid #06b6d4; padding: 12px; margin-bottom: 10px; background: rgba(255,255,255,0.03); border-radius: 4px; line-height: 1.6; }
-        
-        /* Right-to-Left Support */
         [dir="rtl"] .list-item { border-left: none; border-right: 3px solid #06b6d4; }
     </style>
 </head>
@@ -51,9 +45,9 @@
         <div class="container">
             <aside class="card">
                 <label id="lblProject">Project Name</label>
-                <input id="projectName" type="text" placeholder="e.g. Hakaweena">
+                <input id="projectName" type="text" placeholder="Hakaweena...">
                 
-                <label id="lblLanguage">Interface Language</label>
+                <label id="lblLanguage">Language</label>
                 <select id="language" onchange="updateUI(this.value)">
                     <option value="en">English</option>
                     <option value="ar">العربية</option>
@@ -69,17 +63,16 @@
 
                 <label id="lblIndustry">Industry</label>
                 <select id="industry">
+                    <option value="Podcast">Podcast / بودكاست</option>
                     <option value="Cooking">Cooking / طبخ</option>
                     <option value="SaaS">SaaS / برمجيات</option>
                     <option value="Real Estate">Real Estate / عقارات</option>
                     <option value="E-commerce">E-commerce / تجارة إلكترونية</option>
-                    <option value="Podcast">Podcast / بودكاست</option>
                     <option value="Technology">Technology / تقنية</option>
-                    <option value="Education">Education / تعليم</option>
                 </select>
 
                 <label id="lblAudience">Target Audience</label>
-                <textarea id="audience" rows="4" placeholder="Describe who you want to reach..."></textarea>
+                <textarea id="audience" rows="4"></textarea>
                 
                 <button class="primary-btn" id="generateBtn">✨ Generate Content</button>
             </aside>
@@ -94,52 +87,38 @@
     </div>
 
     <script>
-        // القاموس لترجمة الواجهة بالكامل
         const translations = {
-            en: { 
-                project: "Project Name", lang: "Interface Language", country: "Target Country", 
-                ind: "Industry", aud: "Target Audience", btn: "✨ Generate Content", 
-                seo: "🔎 SEO Keywords", slo: "✨ Slogans", head: "📣 Headlines", 
-                desc: "📝 Descriptions", dir: "ltr", ph: "e.g. Hakaweena", audPh: "Describe who you want to reach..."
-            },
-            ar: { 
-                project: "اسم المشروع", lang: "لغة الواجهة", country: "الدولة المستهدفة", 
-                ind: "المجال / التخصص", aud: "الجمهور المستهدف", btn: "✨ توليد المحتوى", 
-                seo: "🔎 كلمات البحث SEO", slo: "✨ الشعارات البيعية", head: "📣 العناوين الجذابة", 
-                desc: "📝 الأوصاف التسويقية", dir: "rtl", ph: "مثلاً: بودكاست هكاوينا", audPh: "صف جمهورك المستهدف هنا..."
-            }
+            en: { project: "Project Name", lang: "Language", country: "Country", ind: "Industry", aud: "Audience", btn: "✨ Generate Content", seo: "🔎 SEO Keywords", slo: "✨ Slogans", head: "📣 Headlines", desc: "📝 Descriptions", dir: "ltr" },
+            ar: { project: "اسم المشروع", lang: "اللغة", country: "الدولة المستهدفة", ind: "المجال", aud: "الجمهور المستهدف", btn: "✨ توليد المحتوى", seo: "🔎 كلمات البحث", slo: "✨ الشعارات", head: "📣 العناوين", desc: "📝 الأوصاف", dir: "rtl" }
         };
 
         function updateUI(lang) {
             const t = translations[lang];
             document.getElementById('lblProject').innerText = t.project;
-            document.getElementById('projectName').placeholder = t.ph;
             document.getElementById('lblLanguage').innerText = t.lang;
             document.getElementById('lblCountry').innerText = t.country;
             document.getElementById('lblIndustry').innerText = t.ind;
             document.getElementById('lblAudience').innerText = t.aud;
-            document.getElementById('audience').placeholder = t.audPh;
             document.getElementById('generateBtn').innerText = t.btn;
             document.getElementById('hSEO').innerText = t.seo;
             document.getElementById('hSlogans').innerText = t.slo;
             document.getElementById('hHeadlines').innerText = t.head;
             document.getElementById('hDesc').innerText = t.desc;
-            
-            // قلب اتجاه الصفحة بالكامل
             document.body.style.direction = t.dir;
         }
 
-        // إرسال البيانات للـ Python
-        document.getElementById('generateBtn').addEventListener('click', () => {
-            const pName = document.getElementById('projectName').value.strip();
-            if(!pName) { 
-                alert(document.body.style.direction === 'rtl' ? "الرجاء إدخال اسم المشروع" : "Please enter Project Name"); 
-                return; 
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const pInput = document.getElementById('projectName');
+            // التصحيح هنا: استخدام .trim() بدلاً من .strip()
+            const pName = pInput.value.trim();
+            
+            if(!pName) {
+                alert(document.body.style.direction === 'rtl' ? "الرجاء إدخال اسم المشروع" : "Please enter Project Name");
+                return;
             }
 
-            const btn = document.getElementById('generateBtn');
-            btn.innerText = (document.body.style.direction === 'rtl' ? "...جاري التحضير" : "...Processing");
-            btn.disabled = true;
+            this.innerText = (document.body.style.direction === 'rtl' ? "...جاري المعالجة" : "...Processing");
+            this.disabled = true;
 
             const payload = {
                 project: pName,
@@ -153,18 +132,15 @@
         });
 
         /*AI_DATA_PLACEHOLDER*/
-        // استقبال النتائج من Gemini وعرضها
         if (typeof ai_output !== 'undefined' && ai_output) {
-            try {
-                document.getElementById('primaryKeywords').innerHTML = ai_output.primaryKeywords.map(k => `<span class="tag">${k}</span>`).join('');
-                document.getElementById('slogans').innerHTML = ai_output.slogans.map(s => `<div class="list-item">${s}</div>`).join('');
-                document.getElementById('shortHeadlines').innerHTML = ai_output.shortHeadlines.map(h => `<div class="list-item">${h}</div>`).join('');
-                document.getElementById('descriptions').innerHTML = ai_output.descriptions.map(d => `<div class="list-item">${d}</div>`).join('');
-            } catch (e) {
-                console.error("Error rendering AI content", e);
-            }
-            document.getElementById('generateBtn').disabled = false;
-            document.getElementById('generateBtn').innerText = translations[document.getElementById('language').value].btn;
+            document.getElementById('primaryKeywords').innerHTML = ai_output.primaryKeywords.map(k => `<span class="tag">${k}</span>`).join('');
+            document.getElementById('slogans').innerHTML = ai_output.slogans.map(s => `<div class="list-item">${s}</div>`).join('');
+            document.getElementById('shortHeadlines').innerHTML = ai_output.shortHeadlines.map(h => `<div class="list-item">${h}</div>`).join('');
+            document.getElementById('descriptions').innerHTML = ai_output.descriptions.map(d => `<div class="list-item">${d}</div>`).join('');
+            
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = false;
+            btn.innerText = translations[document.getElementById('language').value].btn;
         }
     </script>
 </body>
