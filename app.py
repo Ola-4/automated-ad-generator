@@ -4,7 +4,7 @@ from google import genai
 
 st.set_page_config(layout="wide", page_title="Professional Content Builder")
 
-# تعديل الألوان لتكون فاتحة وواضحة (Light Mode)
+# الألوان الفاتحة والواضحة (Light Mode)
 st.markdown("""
 <style>
 .main { background-color: #ffffff; color: #1e293b; }
@@ -30,11 +30,7 @@ st.markdown("""
     border-left: 4px solid #7c3aed;
     margin-bottom: 10px;
     color: #1e293b;
-    border-top: 1px solid #e2e8f0;
-    border-bottom: 1px solid #e2e8f0;
-    border-right: 1px solid #e2e8f0;
 }
-/* تنسيق العناوين الفرعية لتكون واضحة */
 h1, h2, h3, .stSubheader {
     color: #1e293b !important;
 }
@@ -56,27 +52,15 @@ with st.container():
     col1, col2 = st.columns(2)
 
     with col1:
-        p_name = st.text_input(
-            "اسم المشروع / العلامة التجارية",
-            placeholder="أدخلي اسم المشروع هنا..."
-        )
-        industry = st.selectbox(
-            "مجال العمل",
-            ["بودكاست", "تقنية/SaaS", "عقارات", "طبخ/أغذية", "تعليم", "تجارة إلكترونية", "أخرى"]
-        )
+        p_name = st.text_input("اسم المشروع / العلامة التجارية", placeholder="أدخلي اسم المشروع هنا...")
+        industry = st.selectbox("مجال العمل", ["بودكاست", "تقنية/SaaS", "عقارات", "طبخ/أغذية", "تعليم", "تجارة إلكترونية", "أخرى"])
 
     with col2:
-        # إضافة الدول المطلوبة للقائمة
-        target_country = st.selectbox(
-            "الدولة المستهدفة",
-            ["Sudan", "Saudi Arabia", "Egypt", "UAE", "Global"]
-        )
+        # الدول المطلوبة موجودة هنا
+        target_country = st.selectbox("الدولة المستهدفة", ["Sudan", "Saudi Arabia", "Egypt", "UAE", "Global"])
         lang = st.selectbox("اللغة", ["العربية", "English"])
 
-    audience = st.text_area(
-        "تفاصيل الجمهور المستهدف (Target Audience)",
-        placeholder="مثلاً: الشباب المهتمين بالثقافة، أو أصحاب الشركات الناشئة..."
-    )
+    audience = st.text_area("تفاصيل الجمهور المستهدف (Target Audience)", placeholder="مثلاً: الشباب المهتمين بالثقافة...")
 
     generate = st.button("توليد الخطة التسويقية ✨")
 
@@ -92,59 +76,38 @@ if generate:
     else:
         prompt = f"""
 Act as a Senior SEO & Content Strategist.
-
-Create a data-driven content plan for:
-Project: {p_name}
-Industry: {industry}
-Country: {target_country}
-Language: {lang}
-Target Audience: {audience}
-
-Return ONLY valid JSON with this exact structure:
+Create a plan for: {p_name}, Industry: {industry}, Country: {target_country}, Language: {lang}.
+Return ONLY valid JSON:
 {{
-  "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"],
-  "slogans": ["slogan 1", "slogan 2", "slogan 3"],
-  "headlines": ["headline 1", "headline 2", "headline 3"],
-  "descriptions": ["description 1", "description 2"]
+  "keywords": ["5 keywords"],
+  "slogans": ["3 slogans"],
+  "headlines": ["3 headlines"],
+  "descriptions": ["2 descriptions"]
 }}
 """
-
-        with st.spinner("جاري تحليل البيانات وتوليد المحتوى..."):
+        with st.spinner("جاري التوليد..."):
             try:
+                # تم الرجوع للموديل المستقر 1.5 لتجنب خطأ الـ Quota
                 response = client.models.generate_content(
-                    model="gemini-2.0-flash", # تم تعديل اسم الموديل للأكثر استقراراً
+                    model="gemini-1.5-flash", 
                     contents=prompt,
                 )
-
-                raw_text = response.text
-                res = extract_json(raw_text)
-
+                res = extract_json(response.text)
                 st.success(f"تم تجهيز الخطة لمشروع: {p_name}")
 
                 res_col1, res_col2 = st.columns(2)
-
                 with res_col1:
                     st.subheader("🔎 SEO & Keywords")
                     st.write(", ".join(res["keywords"]))
-
                     st.subheader("✨ Slogans")
                     for s in res["slogans"]:
-                        st.markdown(
-                            f'<div class="info-card">{s}</div>',
-                            unsafe_allow_html=True
-                        )
-
+                        st.markdown(f'<div class="info-card">{s}</div>', unsafe_allow_html=True)
                 with res_col2:
                     st.subheader("📣 Headlines")
                     for h in res["headlines"]:
-                        st.markdown(
-                            f'<div class="info-card">{h}</div>',
-                            unsafe_allow_html=True
-                        )
-
+                        st.markdown(f'<div class="info-card">{h}</div>', unsafe_allow_html=True)
                     st.subheader("📝 Meta Descriptions")
                     for d in res["descriptions"]:
                         st.info(d)
-
             except Exception as e:
                 st.error(f"حدث خطأ: {e}")
