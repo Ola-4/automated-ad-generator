@@ -149,7 +149,10 @@ def ui_text(lang: str) -> dict:
             "ideas": "💡 أفكار المحتوى",
             "url_ok": "تم التحقق من الرابط واستخدام محتواه لتحسين النتائج.",
             "url_bad": "تعذر قراءة الرابط. سيتم التوليد بدون محتوى الصفحة.",
-            "url_invalid": "الرابط غير صالح. سيتم تجاهله."
+            "url_invalid": "الرابط غير صالح. سيتم تجاهله.",
+            "copy": "نسخ",
+            "download": "تحميل الخطة",
+            "download_file": "marketing_plan.txt"
         }
     return {
         "page_title": "🚀 Smart Content Builder",
@@ -181,7 +184,10 @@ def ui_text(lang: str) -> dict:
         "ideas": "💡 Content Ideas",
         "url_ok": "URL was checked and page content was used to improve results.",
         "url_bad": "Could not read the URL. Results were generated without page content.",
-        "url_invalid": "Invalid URL. It was ignored."
+        "url_invalid": "Invalid URL. It was ignored.",
+        "copy": "Copy",
+        "download": "Download Plan",
+        "download_file": "marketing_plan.txt"
     }
 
 
@@ -245,6 +251,47 @@ def fetch_url_context(url: str) -> dict:
     except Exception as e:
         result["error"] = str(e)
         return result
+
+
+def list_to_text(items):
+    return "\n".join([f"- {item}" for item in items])
+
+
+def build_download_text(res: dict, text: dict, project_name: str) -> str:
+    parts = [
+        f"{text['success']}{project_name}",
+        "",
+        text["primary_keywords"],
+        list_to_text(res["primary_keywords"]),
+        "",
+        text["supporting_keywords"],
+        list_to_text(res["supporting_keywords"]),
+        "",
+        text["meta_title"],
+        res["meta_title"],
+        "",
+        text["meta_description"],
+        res["meta_description"],
+        "",
+        text["slogans"],
+        list_to_text(res["slogans"]),
+        "",
+        text["short_headlines"],
+        list_to_text(res["short_headlines"]),
+        "",
+        text["long_headlines"],
+        list_to_text(res["long_headlines"]),
+        "",
+        text["descriptions"],
+        list_to_text(res["descriptions"]),
+        "",
+        text["ctas"],
+        list_to_text(res["ctas"]),
+        "",
+        text["ideas"],
+        list_to_text(res["content_ideas"]),
+    ]
+    return "\n".join(parts)
 
 
 top_col1, top_col2 = st.columns([1, 3])
@@ -415,76 +462,51 @@ Return this exact JSON structure:
 
                 st.success(f'{text["success"]}{p_name}')
 
+                plan_text = build_download_text(res, text, p_name)
+                st.download_button(
+                    label=text["download"],
+                    data=plan_text,
+                    file_name=text["download_file"],
+                    mime="text/plain"
+                )
+
                 col_a, col_b = st.columns(2)
 
                 with col_a:
                     st.subheader(text["seo"])
 
                     st.markdown(f"**{text['primary_keywords']}**")
-                    for k in res["primary_keywords"]:
-                        st.markdown(
-                            f'<div class="small-card">{k}</div>',
-                            unsafe_allow_html=True
-                        )
+                    st.code("\n".join(res["primary_keywords"]), language=None)
+                    st.caption(text["copy"])
+                    st.code("\n".join(res["primary_keywords"]), language=None)
 
                     st.markdown(f"**{text['supporting_keywords']}**")
-                    for k in res["supporting_keywords"]:
-                        st.markdown(
-                            f'<div class="small-card">{k}</div>',
-                            unsafe_allow_html=True
-                        )
+                    st.code("\n".join(res["supporting_keywords"]), language=None)
 
                     st.markdown(f"**{text['meta_title']}**")
-                    st.markdown(
-                        f'<div class="info-card">{res["meta_title"]}</div>',
-                        unsafe_allow_html=True
-                    )
+                    st.code(res["meta_title"], language=None)
 
                     st.markdown(f"**{text['meta_description']}**")
-                    st.markdown(
-                        f'<div class="info-card">{res["meta_description"]}</div>',
-                        unsafe_allow_html=True
-                    )
+                    st.code(res["meta_description"], language=None)
 
                     st.subheader(text["slogans"])
-                    for s in res["slogans"]:
-                        st.markdown(
-                            f'<div class="info-card">{s}</div>',
-                            unsafe_allow_html=True
-                        )
+                    st.code("\n".join(res["slogans"]), language=None)
 
                     st.subheader(text["ctas"])
-                    for c in res["ctas"]:
-                        st.markdown(
-                            f'<div class="small-card">{c}</div>',
-                            unsafe_allow_html=True
-                        )
+                    st.code("\n".join(res["ctas"]), language=None)
 
                 with col_b:
                     st.subheader(text["short_headlines"])
-                    for h in res["short_headlines"]:
-                        st.markdown(
-                            f'<div class="info-card">{h}</div>',
-                            unsafe_allow_html=True
-                        )
+                    st.code("\n".join(res["short_headlines"]), language=None)
 
                     st.subheader(text["long_headlines"])
-                    for h in res["long_headlines"]:
-                        st.markdown(
-                            f'<div class="info-card">{h}</div>',
-                            unsafe_allow_html=True
-                        )
+                    st.code("\n".join(res["long_headlines"]), language=None)
 
                 st.subheader(text["descriptions"])
-                for d in res["descriptions"]:
-                    st.info(d)
+                st.code("\n".join(res["descriptions"]), language=None)
 
                 st.subheader(text["ideas"])
-                for idea in res["content_ideas"]:
-                    st.markdown(
-                        f'<div class="small-card">{idea}</div>',
-                        unsafe_allow_html=True
-                    )
+                st.code("\n".join(res["content_ideas"]), language=None)
 
             except Exception as e:
                 st.error(f"حدث خطأ: {e}" if lang == "العربية" else f"Error: {e}")
