@@ -200,6 +200,39 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 
 
+def init_state() -> None:
+    defaults = {
+        "lang": "العربية",
+        "project_name": "",
+        "target_country": "Egypt",
+        "industry": "بودكاست",
+        "audience": "",
+        "website_url": "",
+        "extra_keywords": "",
+        "generated": False,
+        "result": None,
+        "url_context": None,
+        "extracted_keywords": [],
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+
+def reset_form() -> None:
+    st.session_state.lang = "العربية"
+    st.session_state.project_name = ""
+    st.session_state.target_country = "Egypt"
+    st.session_state.industry = "بودكاست"
+    st.session_state.audience = ""
+    st.session_state.website_url = ""
+    st.session_state.extra_keywords = ""
+    st.session_state.generated = False
+    st.session_state.result = None
+    st.session_state.url_context = None
+    st.session_state.extracted_keywords = []
+
+
 def extract_json(text: str) -> dict:
     text = text.strip()
     if text.startswith("```"):
@@ -237,7 +270,8 @@ def ui_text(lang: str) -> dict:
             "url_placeholder": "مثلاً: https://example.com",
             "seed_label": "كلمات إضافية اختيارية",
             "seed_placeholder": "اختياري: كلمات إضافية تريدين دعم النتائج بها",
-            "button": "توليد الخطة التسويقية ✨",
+            "generate_button": "توليد الخطة التسويقية ✨",
+            "reset_button": "إعادة ضبط",
             "warning_project": "الرجاء إدخال اسم المشروع للمتابعة.",
             "spinner": "جاري تحليل البيانات وتوليد المحتوى...",
             "success": "تم تجهيز الخطة لمشروع: ",
@@ -271,6 +305,7 @@ def ui_text(lang: str) -> dict:
             "descriptions": "📝 الوصف التسويقي",
             "ctas": "🚀 الاقتراحات",
             "ideas": "💡 أفكار المحتوى",
+            "preview_text": "ألصقي رابط صفحة وسيحاول التطبيق استخراج العناوين، التصنيفات، نصوص الروابط، وأهم إشارات الكلمات المفتاحية تلقائيًا.",
         }
     return {
         "page_title": "🚀 Smart Content Builder",
@@ -286,7 +321,8 @@ def ui_text(lang: str) -> dict:
         "url_placeholder": "For example: https://example.com",
         "seed_label": "Optional Extra Keywords",
         "seed_placeholder": "Optional: extra terms you want to support the results with",
-        "button": "Generate Marketing Plan ✨",
+        "generate_button": "Generate Marketing Plan ✨",
+        "reset_button": "Reset",
         "warning_project": "Please enter the project name to continue.",
         "spinner": "Analyzing inputs and generating content...",
         "success": "Plan prepared for project: ",
@@ -320,6 +356,7 @@ def ui_text(lang: str) -> dict:
         "descriptions": "📝 Descriptions",
         "ctas": "🚀 CTA Suggestions",
         "ideas": "💡 Content Ideas",
+        "preview_text": "Paste a page URL and the app will try to extract titles, categories, link texts, and on-page keyword signals automatically.",
     }
 
 
@@ -359,6 +396,7 @@ def fetch_url_context(url: str) -> dict:
         "link_texts": [],
         "list_items": [],
         "alt_texts": [],
+        "content_blocks": [],
         "error": "",
     }
 
@@ -457,7 +495,7 @@ def fetch_url_context(url: str) -> dict:
 AR_STOPWORDS = {
     "في", "من", "على", "إلى", "عن", "مع", "هذا", "هذه", "ذلك", "تلك", "هو", "هي",
     "كما", "تم", "او", "أو", "و", "يا", "ما", "لا", "لم", "لن", "كل", "أي", "أن",
-    "إن", "الى", "the", "and", "على", "فيه", "لها", "له", "فيها", "عند", "بعد",
+    "إن", "الى", "the", "and", "فيه", "لها", "له", "فيها", "عند", "بعد",
 }
 
 EN_STOPWORDS = {
@@ -599,136 +637,64 @@ def build_download_text(res: dict, text: dict, project_name: str) -> str:
     return "\n".join(parts)
 
 
-if "lang" not in st.session_state:
-    st.session_state.lang = "العربية"
+def generate_plan() -> None:
+    lang = st.session_state.lang
+    text = ui_text(lang)
 
-lang = st.session_state.lang
-text = ui_text(lang)
+    p_name = st.session_state.project_name
+    target_country = st.session_state.target_country
+    industry = st.session_state.industry
+    audience = st.session_state.audience
+    website_url = st.session_state.website_url
+    extra_keywords = st.session_state.extra_keywords
 
-st.title(text["page_title"])
-st.write(text["subtitle"])
-
-with st.container():
-    left, right = st.columns([1.05, 0.95], gap="large")
-
-    with left:
-        lang = st.selectbox(
-            "Language / اللغة",
-            ["العربية", "English"],
-            key="lang",
-        )
-        text = ui_text(lang)
-
-        p_name = st.text_input(
-            text["project_label"],
-            placeholder=text["project_placeholder"],
-        )
-
-        target_country = st.selectbox(
-            text["country_label"],
-            ["Egypt", "Saudi Arabia", "UAE", "Sudan", "Global"],
-        )
-
-        industry_options_ar = [
-            "بودكاست", "تقنية/SaaS", "عقارات", "طبخ/أغذية", "تعليم",
-            "تجارة إلكترونية", "صحة/عافية", "جمال", "رياضة", "أخرى",
-        ]
-        industry_options_en = [
-            "Podcast", "Technology / SaaS", "Real Estate", "Food / Cooking",
-            "Education", "E-commerce", "Health / Wellness", "Beauty", "Sports", "Other",
-        ]
-
-        industry = st.selectbox(
-            text["industry_label"],
-            industry_options_ar if lang == "العربية" else industry_options_en,
-        )
-
-        audience = st.text_area(
-            text["audience_label"],
-            placeholder=text["audience_placeholder"],
-        )
-
-        website_url = st.text_input(
-            text["url_label"],
-            placeholder=text["url_placeholder"],
-        )
-
-        extra_keywords = st.text_area(
-            text["seed_label"],
-            placeholder=text["seed_placeholder"],
-        )
-
-        generate = st.button(text["button"])
-
-    with right:
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">{text["project_metric"]}</div><div class="metric-value">{p_name if p_name else "—"}</div></div>',
-                unsafe_allow_html=True,
-            )
-        with c2:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">{text["country_metric"]}</div><div class="metric-value">{target_country if target_country else "—"}</div></div>',
-                unsafe_allow_html=True,
-            )
-        with c3:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">{text["industry_metric"]}</div><div class="metric-value">{industry if industry else "—"}</div></div>',
-                unsafe_allow_html=True,
-            )
-
-        st.markdown("### URL & AI Preview")
-        st.write("Paste a page URL and the app will try to extract titles, categories, link texts, list items, and on-page keyword signals automatically.")
-
-
-if generate:
     if not p_name:
         st.warning(text["warning_project"])
-    else:
-        tone_instruction = get_country_tone(target_country, lang)
+        return
 
-        cleaned_url = normalize_url(website_url)
-        url_context = {
-            "ok": False,
-            "title": "",
-            "description": "",
-            "meta_keywords": [],
-            "content": "",
-            "headings": [],
-            "link_texts": [],
-            "list_items": [],
-            "alt_texts": [],
-            "content_blocks": [],
-            "final_url": "",
-            "error": "",
-        }
+    tone_instruction = get_country_tone(target_country, lang)
 
-        extracted_keywords = []
-        extra_keywords_list = split_extra_keywords(extra_keywords)
+    cleaned_url = normalize_url(website_url)
+    url_context = {
+        "ok": False,
+        "title": "",
+        "description": "",
+        "meta_keywords": [],
+        "content": "",
+        "headings": [],
+        "link_texts": [],
+        "list_items": [],
+        "alt_texts": [],
+        "content_blocks": [],
+        "final_url": "",
+        "error": "",
+    }
 
-        if website_url.strip():
-            if cleaned_url.startswith("http://") or cleaned_url.startswith("https://"):
-                url_context = fetch_url_context(cleaned_url)
-                if url_context["ok"]:
-                    st.success(text["url_ok"])
-                    extracted_keywords = extract_keywords_from_url_context(url_context, lang)
-                else:
-                    st.warning(text["url_bad"])
+    extracted_keywords = []
+    extra_keywords_list = split_extra_keywords(extra_keywords)
+
+    if website_url.strip():
+        if cleaned_url.startswith("http://") or cleaned_url.startswith("https://"):
+            url_context = fetch_url_context(cleaned_url)
+            if url_context["ok"]:
+                st.success(text["url_ok"])
+                extracted_keywords = extract_keywords_from_url_context(url_context, lang)
             else:
-                st.warning(text["url_invalid"])
+                st.warning(text["url_bad"])
+        else:
+            st.warning(text["url_invalid"])
 
-        merged_keywords = []
-        seen_keywords = set()
-        for kw in extracted_keywords + extra_keywords_list:
-            key = kw.lower()
-            if kw and key not in seen_keywords:
-                merged_keywords.append(kw)
-                seen_keywords.add(key)
+    merged_keywords = []
+    seen_keywords = set()
+    for kw in extracted_keywords + extra_keywords_list:
+        key = kw.lower()
+        if kw and key not in seen_keywords:
+            merged_keywords.append(kw)
+            seen_keywords.add(key)
 
-        url_instruction = ""
-        if url_context["ok"]:
-            url_instruction = f"""
+    url_instruction = ""
+    if url_context["ok"]:
+        url_instruction = f"""
 Website URL checked successfully.
 Final URL: {url_context["final_url"]}
 Page Title: {url_context["title"]}
@@ -747,7 +713,7 @@ Automatically extracted keyword candidates from the page:
 Use this page context strongly to improve the accuracy of the output.
 """
 
-        prompt = f"""
+    prompt = f"""
 Act as a Senior SEO & Content Strategist and high-conversion copywriter.
 
 Project Name: {p_name}
@@ -795,96 +761,195 @@ Return this exact JSON structure:
 }}
 """
 
-        with st.spinner(text["spinner"]):
-            try:
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt,
-                )
+    with st.spinner(text["spinner"]):
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        raw_text = response.text
+        res = extract_json(raw_text)
 
-                raw_text = response.text
-                res = extract_json(raw_text)
+    st.session_state.generated = True
+    st.session_state.result = res
+    st.session_state.url_context = url_context
+    st.session_state.extracted_keywords = extracted_keywords
 
-                st.success(f'{text["success"]}{p_name}')
 
-                if url_context["ok"]:
-                    with st.expander(text["url_insights"], expanded=False):
-                        if url_context["title"]:
-                            st.markdown(f"**{text['page_title_label']}:** {url_context['title']}")
-                        if url_context["description"]:
-                            st.markdown(f"**{text['page_desc_label']}:** {url_context['description']}")
-                        if url_context["meta_keywords"]:
-                            st.markdown(f"**{text['meta_keywords_label']}:**")
-                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["meta_keywords"][:20]]), unsafe_allow_html=True)
-                        if url_context["headings"]:
-                            st.markdown(f"**{text['headings_label']}:**")
-                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["headings"][:20]]), unsafe_allow_html=True)
-                        if url_context["link_texts"]:
-                            st.markdown(f"**{text['link_texts_label']}:**")
-                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["link_texts"][:20]]), unsafe_allow_html=True)
-                        if url_context["list_items"]:
-                            st.markdown(f"**{text['list_items_label']}:**")
-                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["list_items"][:20]]), unsafe_allow_html=True)
-                        if url_context["alt_texts"]:
-                            st.markdown(f"**{text['alt_texts_label']}:**")
-                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["alt_texts"][:20]]), unsafe_allow_html=True)
-                        if extracted_keywords:
-                            st.markdown(f"**{text['extracted_keywords']}:**")
-                            st.markdown(
-                                "".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords[:30]]),
-                                unsafe_allow_html=True,
-                            )
+init_state()
 
-                plan_text = build_download_text(res, text, p_name)
-                st.download_button(
-                    label=text["download"],
-                    data=plan_text,
-                    file_name=text["download_file"],
-                    mime="text/plain",
-                )
+lang = st.session_state.lang
+text = ui_text(lang)
 
-                tab1, tab2, tab3 = st.tabs([
-                    text["seo_tab"],
-                    text["ads_tab"],
-                    text["ideas_tab"],
-                ])
+st.title(text["page_title"])
+st.write(text["subtitle"])
 
-                with tab1:
-                    st.markdown(f"**{text['primary_keywords']}**")
-                    st.code("\n".join(res["primary_keywords"]), language=None)
+with st.container():
+    left, right = st.columns([1.05, 0.95], gap="large")
 
-                    st.markdown(f"**{text['supporting_keywords']}**")
-                    st.code("\n".join(res["supporting_keywords"]), language=None)
+    with left:
+        st.selectbox(
+            "Language / اللغة",
+            ["العربية", "English"],
+            key="lang",
+        )
+        text = ui_text(st.session_state.lang)
 
-                    st.markdown(f"**{text['meta_title']}**")
-                    st.code(res["meta_title"], language=None)
+        industry_options_ar = [
+            "بودكاست", "تقنية/SaaS", "عقارات", "طبخ/أغذية", "تعليم",
+            "تجارة إلكترونية", "صحة/عافية", "جمال", "رياضة", "أخرى",
+        ]
+        industry_options_en = [
+            "Podcast", "Technology / SaaS", "Real Estate", "Food / Cooking",
+            "Education", "E-commerce", "Health / Wellness", "Beauty", "Sports", "Other",
+        ]
 
-                    st.markdown(f"**{text['meta_description']}**")
-                    st.code(res["meta_description"], language=None)
+        st.text_input(
+            text["project_label"],
+            placeholder=text["project_placeholder"],
+            key="project_name",
+        )
 
-                with tab2:
-                    col_a, col_b = st.columns(2)
+        st.selectbox(
+            text["country_label"],
+            ["Egypt", "Saudi Arabia", "UAE", "Sudan", "Global"],
+            key="target_country",
+        )
 
-                    with col_a:
-                        st.subheader(text["slogans"])
-                        st.code("\n".join(res["slogans"]), language=None)
+        current_industry_options = industry_options_ar if st.session_state.lang == "العربية" else industry_options_en
+        if st.session_state.industry not in current_industry_options:
+            st.session_state.industry = current_industry_options[0]
 
-                        st.subheader(text["ctas"])
-                        st.code("\n".join(res["ctas"]), language=None)
+        st.selectbox(
+            text["industry_label"],
+            current_industry_options,
+            key="industry",
+        )
 
-                    with col_b:
-                        st.subheader(text["short_headlines"])
-                        st.code("\n".join(res["short_headlines"]), language=None)
+        st.text_area(
+            text["audience_label"],
+            placeholder=text["audience_placeholder"],
+            key="audience",
+        )
 
-                        st.subheader(text["long_headlines"])
-                        st.code("\n".join(res["long_headlines"]), language=None)
+        st.text_input(
+            text["url_label"],
+            placeholder=text["url_placeholder"],
+            key="website_url",
+        )
 
-                    st.subheader(text["descriptions"])
-                    st.code("\n".join(res["descriptions"]), language=None)
+        st.text_area(
+            text["seed_label"],
+            placeholder=text["seed_placeholder"],
+            key="extra_keywords",
+        )
 
-                with tab3:
-                    st.subheader(text["ideas"])
-                    st.code("\n".join(res["content_ideas"]), language=None)
+        btn_col1, btn_col2 = st.columns(2)
+        with btn_col1:
+            st.button(text["generate_button"], on_click=generate_plan, use_container_width=True)
+        with btn_col2:
+            st.button(text["reset_button"], on_click=reset_form, use_container_width=True)
 
-            except Exception as e:
-                st.error(f"حدث خطأ: {e}" if lang == "العربية" else f"Error: {e}")
+    with right:
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-label">{text["project_metric"]}</div><div class="metric-value">{st.session_state.project_name if st.session_state.project_name else "—"}</div></div>',
+                unsafe_allow_html=True,
+            )
+        with c2:
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-label">{text["country_metric"]}</div><div class="metric-value">{st.session_state.target_country if st.session_state.target_country else "—"}</div></div>',
+                unsafe_allow_html=True,
+            )
+        with c3:
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-label">{text["industry_metric"]}</div><div class="metric-value">{st.session_state.industry if st.session_state.industry else "—"}</div></div>',
+                unsafe_allow_html=True,
+            )
+
+        st.markdown("### URL & AI Preview")
+        st.write(text["preview_text"])
+
+
+if st.session_state.generated and st.session_state.result:
+    res = st.session_state.result
+    url_context = st.session_state.url_context or {}
+    extracted_keywords = st.session_state.extracted_keywords or []
+
+    st.success(f'{text["success"]}{st.session_state.project_name}')
+
+    if url_context.get("ok"):
+        with st.expander(text["url_insights"], expanded=False):
+            if url_context.get("title"):
+                st.markdown(f"**{text['page_title_label']}:** {url_context['title']}")
+            if url_context.get("description"):
+                st.markdown(f"**{text['page_desc_label']}:** {url_context['description']}")
+            if url_context.get("meta_keywords"):
+                st.markdown(f"**{text['meta_keywords_label']}:**")
+                st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["meta_keywords"][:20]]), unsafe_allow_html=True)
+            if url_context.get("headings"):
+                st.markdown(f"**{text['headings_label']}:**")
+                st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["headings"][:20]]), unsafe_allow_html=True)
+            if url_context.get("link_texts"):
+                st.markdown(f"**{text['link_texts_label']}:**")
+                st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["link_texts"][:20]]), unsafe_allow_html=True)
+            if url_context.get("list_items"):
+                st.markdown(f"**{text['list_items_label']}:**")
+                st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["list_items"][:20]]), unsafe_allow_html=True)
+            if url_context.get("alt_texts"):
+                st.markdown(f"**{text['alt_texts_label']}:**")
+                st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["alt_texts"][:20]]), unsafe_allow_html=True)
+            if extracted_keywords:
+                st.markdown(f"**{text['extracted_keywords']}:**")
+                st.markdown("".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords[:30]]), unsafe_allow_html=True)
+
+    plan_text = build_download_text(res, text, st.session_state.project_name)
+    st.download_button(
+        label=text["download"],
+        data=plan_text,
+        file_name=text["download_file"],
+        mime="text/plain",
+    )
+
+    tab1, tab2, tab3 = st.tabs([
+        text["seo_tab"],
+        text["ads_tab"],
+        text["ideas_tab"],
+    ])
+
+    with tab1:
+        st.markdown(f"**{text['primary_keywords']}**")
+        st.code("\n".join(res["primary_keywords"]), language=None)
+
+        st.markdown(f"**{text['supporting_keywords']}**")
+        st.code("\n".join(res["supporting_keywords"]), language=None)
+
+        st.markdown(f"**{text['meta_title']}**")
+        st.code(res["meta_title"], language=None)
+
+        st.markdown(f"**{text['meta_description']}**")
+        st.code(res["meta_description"], language=None)
+
+    with tab2:
+        col_a, col_b = st.columns(2)
+
+        with col_a:
+            st.subheader(text["slogans"])
+            st.code("\n".join(res["slogans"]), language=None)
+
+            st.subheader(text["ctas"])
+            st.code("\n".join(res["ctas"]), language=None)
+
+        with col_b:
+            st.subheader(text["short_headlines"])
+            st.code("\n".join(res["short_headlines"]), language=None)
+
+            st.subheader(text["long_headlines"])
+            st.code("\n".join(res["long_headlines"]), language=None)
+
+        st.subheader(text["descriptions"])
+        st.code("\n".join(res["descriptions"]), language=None)
+
+    with tab3:
+        st.subheader(text["ideas"])
+        st.code("\n".join(res["content_ideas"]), language=None)
