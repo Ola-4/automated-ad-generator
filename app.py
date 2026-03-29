@@ -171,7 +171,7 @@ def ui_text(lang: str) -> dict:
             "short_headlines": "📣 العناوين القصيرة",
             "long_headlines": "📢 العناوين الطويلة",
             "descriptions": "📝 الوصف التسويقي",
-            "ctas": "🚀 الدعوات لاتخاذ إجراء",
+            "ctas": "🚀 الاقتراحات",
             "ideas": "💡 أفكار المحتوى",
             "url_ok": "تم التحقق من الرابط واستخدام محتواه لتحسين النتائج.",
             "url_bad": "تعذر قراءة الرابط. سيتم التوليد بدون محتوى الصفحة.",
@@ -632,7 +632,6 @@ Return this exact JSON structure:
                     text["seo_tab"],
                     text["ads_tab"],
                     text["ideas_tab"],
-                    text["raw_tab"]
                 ])
 
                 with tab1:
@@ -672,8 +671,6 @@ Return this exact JSON structure:
                     st.subheader(text["ideas"])
                     st.code("\n".join(res["content_ideas"]), language=None)
 
-                with tab4:
-                    st.json(res)
 
             except Exception as e:
                 st.error(f"حدث خطأ: {e}" if lang == "العربية" else f"Error: {e}")
