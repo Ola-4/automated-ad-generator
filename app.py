@@ -11,15 +11,16 @@ st.set_page_config(layout="wide", page_title="Professional Content Builder")
 
 st.markdown("""
 <style>
-/* ===== Background ===== */
-.main {
-    background:
-        linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+/* ===== Force dark background everywhere ===== */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main {
+    background: linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%) !important;
+    color: #ffffff !important;
 }
 
-/* ===== Global text ===== */
-html, body, [class*="css"] {
-    color: #ffffff !important;
+[data-testid="stAppViewContainer"] > .main,
+section.main,
+.block-container {
+    background: transparent !important;
 }
 
 .block-container {
@@ -36,7 +37,7 @@ h1 {
     letter-spacing: -0.4px;
 }
 
-h2, h3 {
+h2, h3, h4, h5, h6 {
     color: #ffffff !important;
     font-weight: 700 !important;
 }
@@ -72,6 +73,13 @@ label, .stTextInput label, .stSelectbox label, .stTextArea label {
     font-weight: 500 !important;
 }
 
+/* Dropdown menu text */
+[data-baseweb="menu"] *,
+[data-baseweb="popover"] * {
+    color: #0f172a !important;
+}
+
+/* Placeholder */
 input::placeholder,
 textarea::placeholder {
     color: #64748b !important;
@@ -81,56 +89,58 @@ textarea::placeholder {
 /* ===== Buttons ===== */
 .stButton > button {
     width: 100%;
-    background: linear-gradient(90deg, #7c3aed, #2563eb);
+    background: linear-gradient(90deg, #7c3aed, #2563eb) !important;
     color: white !important;
-    border: none;
-    padding: 13px 16px;
-    font-weight: 800;
-    border-radius: 12px;
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+    border: none !important;
+    padding: 13px 16px !important;
+    font-weight: 800 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28) !important;
 }
 
 .stDownloadButton > button {
     width: 100%;
-    background: #1d4ed8;
+    background: #1d4ed8 !important;
     color: white !important;
-    border: 1px solid #2563eb;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-weight: 700;
+    border: 1px solid #2563eb !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    font-weight: 700 !important;
 }
 
-/* ===== Cards ===== */
+/* ===== Metric cards ===== */
 .metric-card {
-    background: #111827;
-    border: 1px solid #334155;
-    border-radius: 16px;
-    padding: 16px;
-    min-height: 88px;
-    margin-bottom: 10px;
+    background: #0b1730 !important;
+    border: 1px solid #334155 !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    min-height: 88px !important;
+    margin-bottom: 10px !important;
 }
 
 .metric-label {
-    color: #93c5fd;
-    font-size: 0.9rem;
-    margin-bottom: 6px;
-    font-weight: 600;
+    color: #93c5fd !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 6px !important;
+    font-weight: 600 !important;
 }
 
 .metric-value {
-    color: white;
-    font-weight: 800;
-    font-size: 1.08rem;
-    word-break: break-word;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 1.08rem !important;
+    word-break: break-word !important;
 }
 
+/* ===== Panel card ===== */
 .panel-card {
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 18px;
-    padding: 18px;
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 18px !important;
+    padding: 18px !important;
 }
 
+/* ===== Pills ===== */
 .pill {
     display: inline-block;
     padding: 8px 12px;
@@ -138,7 +148,7 @@ textarea::placeholder {
     background: #1d4ed8;
     border: 1px solid #60a5fa;
     margin: 4px 6px 4px 0;
-    color: white;
+    color: white !important;
     font-size: 0.92rem;
 }
 
@@ -148,11 +158,11 @@ textarea::placeholder {
 }
 
 .stTabs [data-baseweb="tab"] {
-    background: #1e293b;
-    border-radius: 10px;
-    padding: 10px 18px;
+    background: #1e293b !important;
+    border-radius: 10px !important;
+    padding: 10px 18px !important;
     color: white !important;
-    border: 1px solid #334155;
+    border: 1px solid #334155 !important;
 }
 
 .stTabs [aria-selected="true"] {
@@ -161,18 +171,20 @@ textarea::placeholder {
 }
 
 /* ===== Code blocks ===== */
-pre, code {
+pre, code, [data-testid="stCodeBlock"] {
     border-radius: 12px !important;
 }
 
 /* ===== Alerts ===== */
 .stAlert {
-    border-radius: 12px;
+    border-radius: 12px !important;
 }
 
-/* ===== Small text ===== */
-small {
-    color: #cbd5e1 !important;
+/* ===== Expander ===== */
+[data-testid="stExpander"] details {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -250,8 +262,7 @@ def ui_text(lang: str) -> dict:
             "ideas_tab": "Ideas",
             "project_metric": "المشروع",
             "country_metric": "الدولة",
-            "industry_metric": "المجال",
-            "language_label": "اللغة"
+            "industry_metric": "المجال"
         }
     return {
         "page_title": "🚀 Smart Content Builder",
@@ -295,8 +306,7 @@ def ui_text(lang: str) -> dict:
         "ideas_tab": "Ideas",
         "project_metric": "Project",
         "country_metric": "Country",
-        "industry_metric": "Industry",
-        "language_label": "Language"
+        "industry_metric": "Industry"
     }
 
 
@@ -587,191 +597,4 @@ with st.container():
                 unsafe_allow_html=True
             )
 
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        with st.container():
-            st.markdown("### URL & AI Preview")
-            st.write("Paste a page URL and the app will try to extract title, description, headings, and on-page keyword signals automatically.")
-
-
-if generate:
-    if not p_name:
-        st.warning(text["warning_project"])
-    else:
-        tone_instruction = get_country_tone(target_country, lang)
-
-        cleaned_url = normalize_url(website_url)
-        url_context = {
-            "ok": False,
-            "title": "",
-            "description": "",
-            "content": "",
-            "headings": [],
-            "final_url": "",
-            "error": ""
-        }
-
-        extracted_keywords = []
-        extra_keywords_list = split_extra_keywords(extra_keywords)
-
-        if website_url.strip():
-            if cleaned_url.startswith("http://") or cleaned_url.startswith("https://"):
-                url_context = fetch_url_context(cleaned_url)
-                if url_context["ok"]:
-                    st.success(text["url_ok"])
-                    extracted_keywords = extract_keywords_from_url_context(url_context, lang)
-                else:
-                    st.warning(text["url_bad"])
-            else:
-                st.warning(text["url_invalid"])
-
-        merged_keywords = []
-        seen_keywords = set()
-        for kw in extracted_keywords + extra_keywords_list:
-            if kw and kw.lower() not in seen_keywords:
-                merged_keywords.append(kw)
-                seen_keywords.add(kw.lower())
-
-        url_instruction = ""
-        if url_context["ok"]:
-            url_instruction = f"""
-Website URL checked successfully.
-Final URL: {url_context["final_url"]}
-Page Title: {url_context["title"]}
-Meta Description: {url_context["description"]}
-Headings: {", ".join(url_context["headings"])}
-Visible Page Content:
-{url_context["content"]}
-
-Automatically extracted keyword candidates from the page:
-{", ".join(extracted_keywords)}
-
-Use this page context strongly to improve the accuracy of the output.
-"""
-
-        prompt = f"""
-Act as a Senior SEO & Content Strategist and high-conversion copywriter.
-
-Project Name: {p_name}
-Industry: {industry}
-Target Country: {target_country}
-Language: {lang}
-Target Audience: {audience}
-
-Keyword guidance:
-Use these keyword candidates as primary context when relevant:
-{", ".join(merged_keywords)}
-
-{url_instruction}
-
-Important writing instruction:
-{tone_instruction}
-
-Requirements:
-- Make the output feel relevant to the target country.
-- If the selected language is Arabic, adapt the wording style to the selected country.
-- The entire output must be in the selected language.
-- If website context is available, use it to improve relevance and accuracy.
-- Use the automatically extracted keywords from the URL when helpful.
-- Make the meta title clickable, natural, and SEO-friendly.
-- Make the meta description concise and compelling.
-- Separate primary keywords from supporting keywords clearly.
-- Make short headlines suitable for ads.
-- Make long headlines more descriptive and conversion-focused.
-- Keep the output marketing-focused, realistic, and usable.
-- Avoid generic filler.
-- Return ONLY valid JSON.
-
-Return this exact JSON structure:
-{{
-  "primary_keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"],
-  "supporting_keywords": ["support 1", "support 2", "support 3", "support 4", "support 5"],
-  "meta_title": "meta title here",
-  "meta_description": "meta description here",
-  "slogans": ["slogan 1", "slogan 2", "slogan 3"],
-  "short_headlines": ["short 1", "short 2", "short 3", "short 4", "short 5"],
-  "long_headlines": ["long 1", "long 2", "long 3", "long 4", "long 5"],
-  "descriptions": ["description 1", "description 2", "description 3"],
-  "ctas": ["cta 1", "cta 2", "cta 3", "cta 4"],
-  "content_ideas": ["idea 1", "idea 2", "idea 3", "idea 4", "idea 5"]
-}}
-"""
-
-        with st.spinner(text["spinner"]):
-            try:
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt,
-                )
-
-                raw_text = response.text
-                res = extract_json(raw_text)
-
-                st.success(f'{text["success"]}{p_name}')
-
-                if url_context["ok"]:
-                    with st.expander(text["url_insights"], expanded=False):
-                        if url_context["title"]:
-                            st.markdown(f"**{text['page_title_label']}:** {url_context['title']}")
-                        if url_context["description"]:
-                            st.markdown(f"**{text['page_desc_label']}:** {url_context['description']}")
-                        if extracted_keywords:
-                            st.markdown(f"**{text['extracted_keywords']}:**")
-                            st.markdown(
-                                "".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords]),
-                                unsafe_allow_html=True
-                            )
-
-                plan_text = build_download_text(res, text, p_name)
-                st.download_button(
-                    label=text["download"],
-                    data=plan_text,
-                    file_name=text["download_file"],
-                    mime="text/plain"
-                )
-
-                tab1, tab2, tab3 = st.tabs([
-                    text["seo_tab"],
-                    text["ads_tab"],
-                    text["ideas_tab"],
-                ])
-
-                with tab1:
-                    st.markdown(f"**{text['primary_keywords']}**")
-                    st.code("\n".join(res["primary_keywords"]), language=None)
-
-                    st.markdown(f"**{text['supporting_keywords']}**")
-                    st.code("\n".join(res["supporting_keywords"]), language=None)
-
-                    st.markdown(f"**{text['meta_title']}**")
-                    st.code(res["meta_title"], language=None)
-
-                    st.markdown(f"**{text['meta_description']}**")
-                    st.code(res["meta_description"], language=None)
-
-                with tab2:
-                    col_a, col_b = st.columns(2)
-
-                    with col_a:
-                        st.subheader(text["slogans"])
-                        st.code("\n".join(res["slogans"]), language=None)
-
-                        st.subheader(text["ctas"])
-                        st.code("\n".join(res["ctas"]), language=None)
-
-                    with col_b:
-                        st.subheader(text["short_headlines"])
-                        st.code("\n".join(res["short_headlines"]), language=None)
-
-                        st.subheader(text["long_headlines"])
-                        st.code("\n".join(res["long_headlines"]), language=None)
-
-                    st.subheader(text["descriptions"])
-                    st.code("\n".join(res["descriptions"]), language=None)
-
-                with tab3:
-                    st.subheader(text["ideas"])
-                    st.code("\n".join(res["content_ideas"]), language=None)
-
-            except Exception as e:
-                st.error(f"حدث خطأ: {e}" if lang == "العربية" else f"Error: {e}")
+        st.markdown
