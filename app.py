@@ -20,19 +20,16 @@ html, body, [class*="css"] {
     color: #f8fafc;
 }
 
-/* Section title feel */
 .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
 
-/* Labels */
 label, .stTextInput label, .stSelectbox label, .stTextArea label {
     color: #e2e8f0 !important;
     font-weight: 700 !important;
 }
 
-/* Inputs */
 .stTextInput input,
 .stTextArea textarea {
     background-color: #ffffff !important;
@@ -41,7 +38,6 @@ label, .stTextInput label, .stSelectbox label, .stTextArea label {
     border: 1px solid #cbd5e1 !important;
 }
 
-/* Select boxes */
 .stSelectbox div[data-baseweb="select"] > div {
     background-color: #ffffff !important;
     color: #0f172a !important;
@@ -49,14 +45,12 @@ label, .stTextInput label, .stSelectbox label, .stTextArea label {
     border: 1px solid #cbd5e1 !important;
 }
 
-/* Placeholder */
 input::placeholder,
 textarea::placeholder {
     color: #64748b !important;
     opacity: 1 !important;
 }
 
-/* Button */
 .stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #7c3aed, #06b6d4);
@@ -68,7 +62,6 @@ textarea::placeholder {
     box-shadow: 0 10px 24px rgba(124, 58, 237, 0.25);
 }
 
-/* Cards */
 .info-card {
     background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
     color: #f8fafc;
@@ -86,11 +79,6 @@ textarea::placeholder {
     border-radius: 12px;
     margin-bottom: 8px;
     border: 1px solid rgba(255,255,255,0.06);
-}
-
-/* Accent headers */
-h1, h2, h3 {
-    color: #f8fafc !important;
 }
 
 .stAlert {
@@ -138,7 +126,6 @@ def ui_text(lang: str) -> dict:
             "project_placeholder": "أدخلي اسم المشروع هنا...",
             "industry_label": "مجال العمل",
             "country_label": "الدولة المستهدفة",
-            "language_label": "اللغة",
             "audience_label": "تفاصيل الجمهور المستهدف",
             "audience_placeholder": "مثلاً: الشباب المهتمين بالثقافة، أو أصحاب الشركات الناشئة...",
             "seed_label": "الكلمات المفتاحية الأساسية",
@@ -150,6 +137,10 @@ def ui_text(lang: str) -> dict:
             "spinner": "جاري تحليل البيانات وتوليد المحتوى...",
             "success": "تم تجهيز الخطة لمشروع: ",
             "seo": "🔎 الكلمات المفتاحية SEO",
+            "primary_keywords": "الكلمات المفتاحية الأساسية",
+            "supporting_keywords": "الكلمات المفتاحية الداعمة",
+            "meta_title": "عنوان الميتا",
+            "meta_description": "وصف الميتا",
             "slogans": "✨ الشعارات",
             "short_headlines": "📣 العناوين القصيرة",
             "long_headlines": "📢 العناوين الطويلة",
@@ -167,7 +158,6 @@ def ui_text(lang: str) -> dict:
         "project_placeholder": "Enter your project name...",
         "industry_label": "Industry",
         "country_label": "Target Country",
-        "language_label": "Language",
         "audience_label": "Target Audience Details",
         "audience_placeholder": "For example: culture-loving youth, startup founders, busy professionals...",
         "seed_label": "Seed Keywords",
@@ -179,6 +169,10 @@ def ui_text(lang: str) -> dict:
         "spinner": "Analyzing inputs and generating content...",
         "success": "Plan prepared for project: ",
         "seo": "🔎 SEO Keywords",
+        "primary_keywords": "Primary Keywords",
+        "supporting_keywords": "Supporting Keywords",
+        "meta_title": "Meta Title",
+        "meta_description": "Meta Description",
         "slogans": "✨ Slogans",
         "short_headlines": "📣 Short Headlines",
         "long_headlines": "📢 Long Headlines",
@@ -201,18 +195,6 @@ def normalize_url(url: str) -> str:
 
 
 def fetch_url_context(url: str) -> dict:
-    """
-    Tries to fetch the URL and extract useful visible context.
-    Returns:
-      {
-        "ok": bool,
-        "final_url": str,
-        "title": str,
-        "description": str,
-        "content": str,
-        "error": str
-      }
-    """
     result = {
         "ok": False,
         "final_url": "",
@@ -229,9 +211,7 @@ def fetch_url_context(url: str) -> dict:
         response = requests.get(
             url,
             timeout=10,
-            headers={
-                "User-Agent": "Mozilla/5.0"
-            },
+            headers={"User-Agent": "Mozilla/5.0"},
             allow_redirects=True
         )
         response.raise_for_status()
@@ -250,15 +230,15 @@ def fetch_url_context(url: str) -> dict:
         for tag in soup(["script", "style", "noscript"]):
             tag.decompose()
 
-        text = " ".join(soup.get_text(separator=" ").split())
-        text = text[:2500]
+        visible_text = " ".join(soup.get_text(separator=" ").split())
+        visible_text = visible_text[:2500]
 
         result.update({
             "ok": True,
             "final_url": response.url,
             "title": title,
             "description": meta_desc,
-            "content": text
+            "content": visible_text
         })
         return result
 
@@ -347,7 +327,14 @@ if generate:
         tone_instruction = get_country_tone(target_country, lang)
 
         cleaned_url = normalize_url(website_url)
-        url_context = {"ok": False, "title": "", "description": "", "content": "", "final_url": "", "error": ""}
+        url_context = {
+            "ok": False,
+            "title": "",
+            "description": "",
+            "content": "",
+            "final_url": "",
+            "error": ""
+        }
 
         if website_url.strip():
             if cleaned_url.startswith("http://") or cleaned_url.startswith("https://"):
@@ -392,13 +379,21 @@ Requirements:
 - The entire output must be in the selected language.
 - Use the seed keywords naturally.
 - If website context is available, use it to improve relevance and accuracy.
+- Make the meta title clickable, natural, and SEO-friendly.
+- Make the meta description concise and compelling.
+- Separate primary keywords from supporting keywords clearly.
+- Make short headlines suitable for ads.
+- Make long headlines more descriptive and conversion-focused.
 - Keep the output marketing-focused, realistic, and usable.
 - Avoid generic filler.
 - Return ONLY valid JSON.
 
 Return this exact JSON structure:
 {{
-  "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"],
+  "primary_keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"],
+  "supporting_keywords": ["support 1", "support 2", "support 3", "support 4", "support 5"],
+  "meta_title": "meta title here",
+  "meta_description": "meta description here",
   "slogans": ["slogan 1", "slogan 2", "slogan 3"],
   "short_headlines": ["short 1", "short 2", "short 3", "short 4", "short 5"],
   "long_headlines": ["long 1", "long 2", "long 3", "long 4", "long 5"],
@@ -424,11 +419,32 @@ Return this exact JSON structure:
 
                 with col_a:
                     st.subheader(text["seo"])
-                    for k in res["keywords"]:
+
+                    st.markdown(f"**{text['primary_keywords']}**")
+                    for k in res["primary_keywords"]:
                         st.markdown(
                             f'<div class="small-card">{k}</div>',
                             unsafe_allow_html=True
                         )
+
+                    st.markdown(f"**{text['supporting_keywords']}**")
+                    for k in res["supporting_keywords"]:
+                        st.markdown(
+                            f'<div class="small-card">{k}</div>',
+                            unsafe_allow_html=True
+                        )
+
+                    st.markdown(f"**{text['meta_title']}**")
+                    st.markdown(
+                        f'<div class="info-card">{res["meta_title"]}</div>',
+                        unsafe_allow_html=True
+                    )
+
+                    st.markdown(f"**{text['meta_description']}**")
+                    st.markdown(
+                        f'<div class="info-card">{res["meta_description"]}</div>',
+                        unsafe_allow_html=True
+                    )
 
                     st.subheader(text["slogans"])
                     for s in res["slogans"]:
