@@ -11,12 +11,15 @@ st.set_page_config(layout="wide", page_title="Professional Content Builder")
 
 st.markdown("""
 <style>
+/* ===== Background ===== */
 .main {
-    background: linear-gradient(135deg, #020617, #0b1120, #111827);
+    background:
+        linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
 }
 
+/* ===== Global text ===== */
 html, body, [class*="css"] {
-    color: #f8fafc;
+    color: #ffffff !important;
 }
 
 .block-container {
@@ -25,26 +28,39 @@ html, body, [class*="css"] {
     padding-bottom: 2rem;
 }
 
+/* ===== Headings ===== */
 h1 {
     color: #ffffff !important;
     font-weight: 800 !important;
     margin-bottom: 0.35rem !important;
+    letter-spacing: -0.4px;
 }
 
-h2, h3, label {
-    color: #f8fafc !important;
+h2, h3 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
 p {
-    color: #cbd5e1 !important;
+    color: #e5e7eb !important;
+    font-size: 1rem;
 }
 
+/* ===== Labels ===== */
+label, .stTextInput label, .stSelectbox label, .stTextArea label {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+}
+
+/* ===== Inputs ===== */
 .stTextInput input,
 .stTextArea textarea {
     background: #ffffff !important;
     color: #0f172a !important;
     border-radius: 12px !important;
     border: 1px solid #334155 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    font-weight: 500 !important;
 }
 
 .stSelectbox div[data-baseweb="select"] > div {
@@ -52,6 +68,8 @@ p {
     color: #0f172a !important;
     border-radius: 12px !important;
     border: 1px solid #334155 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    font-weight: 500 !important;
 }
 
 input::placeholder,
@@ -60,27 +78,29 @@ textarea::placeholder {
     opacity: 1 !important;
 }
 
+/* ===== Buttons ===== */
 .stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #7c3aed, #2563eb);
-    color: white;
+    color: white !important;
     border: none;
     padding: 13px 16px;
     font-weight: 800;
     border-radius: 12px;
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
 }
 
 .stDownloadButton > button {
     width: 100%;
-    background: #1e293b;
-    color: white;
-    border: 1px solid #334155;
+    background: #1d4ed8;
+    color: white !important;
+    border: 1px solid #2563eb;
     border-radius: 12px;
     padding: 12px 16px;
     font-weight: 700;
 }
 
+/* ===== Cards ===== */
 .metric-card {
     background: #111827;
     border: 1px solid #334155;
@@ -91,9 +111,10 @@ textarea::placeholder {
 }
 
 .metric-label {
-    color: #94a3b8;
+    color: #93c5fd;
     font-size: 0.9rem;
     margin-bottom: 6px;
+    font-weight: 600;
 }
 
 .metric-value {
@@ -103,17 +124,25 @@ textarea::placeholder {
     word-break: break-word;
 }
 
+.panel-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    padding: 18px;
+}
+
 .pill {
     display: inline-block;
     padding: 8px 12px;
     border-radius: 999px;
-    background: rgba(37, 99, 235, 0.16);
-    border: 1px solid rgba(96, 165, 250, 0.25);
+    background: #1d4ed8;
+    border: 1px solid #60a5fa;
     margin: 4px 6px 4px 0;
-    color: #f8fafc;
+    color: white;
     font-size: 0.92rem;
 }
 
+/* ===== Tabs ===== */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
 }
@@ -122,20 +151,28 @@ textarea::placeholder {
     background: #1e293b;
     border-radius: 10px;
     padding: 10px 18px;
-    color: white;
+    color: white !important;
+    border: 1px solid #334155;
 }
 
 .stTabs [aria-selected="true"] {
-    background: #2563eb;
+    background: #2563eb !important;
     color: white !important;
 }
 
+/* ===== Code blocks ===== */
 pre, code {
     border-radius: 12px !important;
 }
 
+/* ===== Alerts ===== */
 .stAlert {
     border-radius: 12px;
+}
+
+/* ===== Small text ===== */
+small {
+    color: #cbd5e1 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -213,7 +250,8 @@ def ui_text(lang: str) -> dict:
             "ideas_tab": "Ideas",
             "project_metric": "المشروع",
             "country_metric": "الدولة",
-            "industry_metric": "المجال"
+            "industry_metric": "المجال",
+            "language_label": "اللغة"
         }
     return {
         "page_title": "🚀 Smart Content Builder",
@@ -257,7 +295,8 @@ def ui_text(lang: str) -> dict:
         "ideas_tab": "Ideas",
         "project_metric": "Project",
         "country_metric": "Country",
-        "industry_metric": "Industry"
+        "industry_metric": "Industry",
+        "language_label": "Language"
     }
 
 
@@ -451,7 +490,6 @@ def build_download_text(res: dict, text: dict, project_name: str) -> str:
     return "\n".join(parts)
 
 
-# language state
 if "lang" not in st.session_state:
     st.session_state.lang = "العربية"
 
@@ -465,17 +503,17 @@ with st.container():
     left, right = st.columns([1.05, 0.95], gap="large")
 
     with left:
-        p_name = st.text_input(
-            text["project_label"],
-            placeholder=text["project_placeholder"]
-        )
-
         lang = st.selectbox(
             "Language / اللغة",
             ["العربية", "English"],
             key="lang"
         )
         text = ui_text(lang)
+
+        p_name = st.text_input(
+            text["project_label"],
+            placeholder=text["project_placeholder"]
+        )
 
         target_country = st.selectbox(
             text["country_label"],
