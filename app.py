@@ -1,7 +1,9 @@
 import json
 import re
-import streamlit as st
+from collections import Counter
+
 import requests
+import streamlit as st
 from bs4 import BeautifulSoup
 from google import genai
 
@@ -81,6 +83,31 @@ textarea::placeholder {
     border: 1px solid rgba(255,255,255,0.06);
 }
 
+.pill {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(124, 58, 237, 0.18);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    margin: 4px 6px 4px 0;
+    color: #f8fafc;
+    font-size: 0.92rem;
+}
+
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 10px 16px;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(90deg, rgba(124,58,237,0.25), rgba(6,182,212,0.20));
+}
+
 .stAlert {
     border-radius: 12px;
 }
@@ -88,7 +115,6 @@ textarea::placeholder {
 """, unsafe_allow_html=True)
 
 api_key = st.secrets.get("GEMINI_API_KEY")
-
 if not api_key:
     st.error("GEMINI_API_KEY is missing from Streamlit secrets.")
     st.stop()
@@ -128,15 +154,15 @@ def ui_text(lang: str) -> dict:
             "country_label": "الدولة المستهدفة",
             "audience_label": "تفاصيل الجمهور المستهدف",
             "audience_placeholder": "مثلاً: الشباب المهتمين بالثقافة، أو أصحاب الشركات الناشئة...",
-            "seed_label": "الكلمات المفتاحية الأساسية",
-            "seed_placeholder": "مثلاً: بودكاست, قصص, محتوى صوتي, ثقافة, إلهام",
+            "seed_label": "كلمات إضافية اختيارية",
+            "seed_placeholder": "اختياري: كلمات إضافية تريدين دعم النتائج بها",
             "url_label": "رابط الموقع أو الصفحة",
             "url_placeholder": "مثلاً: https://example.com",
             "button": "توليد الخطة التسويقية ✨",
             "warning_project": "الرجاء إدخال اسم المشروع للمتابعة.",
             "spinner": "جاري تحليل البيانات وتوليد المحتوى...",
             "success": "تم تجهيز الخطة لمشروع: ",
-            "seo": "🔎 الكلمات المفتاحية SEO",
+            "seo": "🔎 SEO",
             "primary_keywords": "الكلمات المفتاحية الأساسية",
             "supporting_keywords": "الكلمات المفتاحية الداعمة",
             "meta_title": "عنوان الميتا",
@@ -150,9 +176,16 @@ def ui_text(lang: str) -> dict:
             "url_ok": "تم التحقق من الرابط واستخدام محتواه لتحسين النتائج.",
             "url_bad": "تعذر قراءة الرابط. سيتم التوليد بدون محتوى الصفحة.",
             "url_invalid": "الرابط غير صالح. سيتم تجاهله.",
-            "copy": "نسخ",
             "download": "تحميل الخطة",
-            "download_file": "marketing_plan.txt"
+            "download_file": "marketing_plan.txt",
+            "url_insights": "🔍 تحليل الرابط",
+            "page_title_label": "عنوان الصفحة",
+            "page_desc_label": "وصف الصفحة",
+            "extracted_keywords": "الكلمات المستخرجة من الرابط",
+            "seo_tab": "SEO",
+            "ads_tab": "Ads",
+            "ideas_tab": "Ideas",
+            "raw_tab": "Raw Output"
         }
     return {
         "page_title": "🚀 Smart Content Builder",
@@ -163,15 +196,15 @@ def ui_text(lang: str) -> dict:
         "country_label": "Target Country",
         "audience_label": "Target Audience Details",
         "audience_placeholder": "For example: culture-loving youth, startup founders, busy professionals...",
-        "seed_label": "Seed Keywords",
-        "seed_placeholder": "For example: podcast, stories, audio content, culture, inspiration",
+        "seed_label": "Optional Extra Keywords",
+        "seed_placeholder": "Optional: extra terms you want to support the results with",
         "url_label": "Website or Page URL",
         "url_placeholder": "For example: https://example.com",
         "button": "Generate Marketing Plan ✨",
         "warning_project": "Please enter the project name to continue.",
         "spinner": "Analyzing inputs and generating content...",
         "success": "Plan prepared for project: ",
-        "seo": "🔎 SEO Keywords",
+        "seo": "🔎 SEO",
         "primary_keywords": "Primary Keywords",
         "supporting_keywords": "Supporting Keywords",
         "meta_title": "Meta Title",
@@ -185,9 +218,16 @@ def ui_text(lang: str) -> dict:
         "url_ok": "URL was checked and page content was used to improve results.",
         "url_bad": "Could not read the URL. Results were generated without page content.",
         "url_invalid": "Invalid URL. It was ignored.",
-        "copy": "Copy",
         "download": "Download Plan",
-        "download_file": "marketing_plan.txt"
+        "download_file": "marketing_plan.txt",
+        "url_insights": "🔍 URL Analysis",
+        "page_title_label": "Page Title",
+        "page_desc_label": "Page Description",
+        "extracted_keywords": "Keywords Extracted From URL",
+        "seo_tab": "SEO",
+        "ads_tab": "Ads",
+        "ideas_tab": "Ideas",
+        "raw_tab": "Raw Output"
     }
 
 
@@ -207,6 +247,7 @@ def fetch_url_context(url: str) -> dict:
         "title": "",
         "description": "",
         "content": "",
+        "headings": [],
         "error": ""
     }
 
@@ -233,24 +274,110 @@ def fetch_url_context(url: str) -> dict:
         if meta and meta.get("content"):
             meta_desc = meta["content"].strip()
 
+        headings = []
+        for tag_name in ["h1", "h2", "h3"]:
+            for tag in soup.find_all(tag_name):
+                txt = " ".join(tag.get_text(separator=" ").split()).strip()
+                if txt:
+                    headings.append(txt)
+
         for tag in soup(["script", "style", "noscript"]):
             tag.decompose()
 
         visible_text = " ".join(soup.get_text(separator=" ").split())
-        visible_text = visible_text[:2500]
+        visible_text = visible_text[:3000]
 
         result.update({
             "ok": True,
             "final_url": response.url,
             "title": title,
             "description": meta_desc,
-            "content": visible_text
+            "content": visible_text,
+            "headings": headings[:10]
         })
         return result
 
     except Exception as e:
         result["error"] = str(e)
         return result
+
+
+AR_STOPWORDS = {
+    "في", "من", "على", "إلى", "عن", "مع", "هذا", "هذه", "ذلك", "تلك", "هو", "هي",
+    "كما", "تم", "او", "أو", "و", "يا", "ما", "لا", "لم", "لن", "كل", "أي", "أن",
+    "إن", "الى", "the", "and"
+}
+
+EN_STOPWORDS = {
+    "the", "and", "for", "with", "that", "this", "from", "your", "you", "into",
+    "are", "our", "was", "were", "will", "have", "has", "had", "about", "more",
+    "than", "into", "their", "they", "them", "www", "com", "https", "http"
+}
+
+
+def tokenize_text(text: str, lang: str) -> list[str]:
+    tokens = re.findall(r"[A-Za-z\u0600-\u06FF]{2,}", text.lower())
+    stopwords = AR_STOPWORDS if lang == "العربية" else EN_STOPWORDS
+    return [t for t in tokens if t not in stopwords and len(t) > 2]
+
+
+def extract_keywords_from_url_context(url_context: dict, lang: str) -> list[str]:
+    if not url_context["ok"]:
+        return []
+
+    weighted_text_parts = []
+
+    if url_context["title"]:
+        weighted_text_parts.extend([url_context["title"]] * 4)
+
+    if url_context["description"]:
+        weighted_text_parts.extend([url_context["description"]] * 3)
+
+    for h in url_context.get("headings", []):
+        weighted_text_parts.extend([h] * 3)
+
+    if url_context["content"]:
+        weighted_text_parts.append(url_context["content"])
+
+    combined = " ".join(weighted_text_parts)
+    tokens = tokenize_text(combined, lang)
+    if not tokens:
+        return []
+
+    counts = Counter(tokens)
+
+    bigrams = Counter()
+    for part in weighted_text_parts:
+        part_tokens = tokenize_text(part, lang)
+        for i in range(len(part_tokens) - 1):
+            bg = f"{part_tokens[i]} {part_tokens[i+1]}"
+            if len(bg) > 5:
+                bigrams[bg] += 1
+
+    candidates = []
+
+    for word, count in counts.most_common(20):
+        candidates.append((word, count))
+
+    for phrase, count in bigrams.most_common(20):
+        candidates.append((phrase, count + 2))
+
+    ranked = sorted(candidates, key=lambda x: x[1], reverse=True)
+
+    final_keywords = []
+    seen = set()
+    for kw, _ in ranked:
+        if kw not in seen:
+            seen.add(kw)
+            final_keywords.append(kw)
+        if len(final_keywords) >= 12:
+            break
+
+    return final_keywords
+
+
+def split_extra_keywords(text: str) -> list[str]:
+    return [k.strip() for k in text.split(",") if k.strip()]
 
 
 def list_to_text(items):
@@ -294,7 +421,7 @@ def build_download_text(res: dict, text: dict, project_name: str) -> str:
     return "\n".join(parts)
 
 
-top_col1, top_col2 = st.columns([1, 3])
+top_col1, _ = st.columns([1, 3])
 with top_col1:
     lang = st.selectbox("Language / اللغة", ["العربية", "English"])
 
@@ -354,14 +481,14 @@ with st.container():
         placeholder=text["audience_placeholder"]
     )
 
-    seed_keywords = st.text_area(
-        text["seed_label"],
-        placeholder=text["seed_placeholder"]
-    )
-
     website_url = st.text_input(
         text["url_label"],
         placeholder=text["url_placeholder"]
+    )
+
+    extra_keywords = st.text_area(
+        text["seed_label"],
+        placeholder=text["seed_placeholder"]
     )
 
     generate = st.button(text["button"])
@@ -379,19 +506,31 @@ if generate:
             "title": "",
             "description": "",
             "content": "",
+            "headings": [],
             "final_url": "",
             "error": ""
         }
+
+        extracted_keywords = []
+        extra_keywords_list = split_extra_keywords(extra_keywords)
 
         if website_url.strip():
             if cleaned_url.startswith("http://") or cleaned_url.startswith("https://"):
                 url_context = fetch_url_context(cleaned_url)
                 if url_context["ok"]:
                     st.success(text["url_ok"])
+                    extracted_keywords = extract_keywords_from_url_context(url_context, lang)
                 else:
                     st.warning(text["url_bad"])
             else:
                 st.warning(text["url_invalid"])
+
+        merged_keywords = []
+        seen_keywords = set()
+        for kw in extracted_keywords + extra_keywords_list:
+            if kw and kw.lower() not in seen_keywords:
+                merged_keywords.append(kw)
+                seen_keywords.add(kw.lower())
 
         url_instruction = ""
         if url_context["ok"]:
@@ -400,8 +539,13 @@ Website URL checked successfully.
 Final URL: {url_context["final_url"]}
 Page Title: {url_context["title"]}
 Meta Description: {url_context["description"]}
+Headings: {", ".join(url_context["headings"])}
 Visible Page Content:
 {url_context["content"]}
+
+Automatically extracted keyword candidates from the page:
+{", ".join(extracted_keywords)}
+
 Use this page context strongly to improve the accuracy of the output.
 """
 
@@ -413,7 +557,10 @@ Industry: {industry}
 Target Country: {target_country}
 Language: {lang}
 Target Audience: {audience}
-Seed Keywords: {seed_keywords}
+
+Keyword guidance:
+Use these keyword candidates as primary context when relevant:
+{", ".join(merged_keywords)}
 
 {url_instruction}
 
@@ -424,8 +571,8 @@ Requirements:
 - Make the output feel relevant to the target country.
 - If the selected language is Arabic, adapt the wording style to the selected country.
 - The entire output must be in the selected language.
-- Use the seed keywords naturally.
 - If website context is available, use it to improve relevance and accuracy.
+- Use the automatically extracted keywords from the URL when helpful.
 - Make the meta title clickable, natural, and SEO-friendly.
 - Make the meta description concise and compelling.
 - Separate primary keywords from supporting keywords clearly.
@@ -462,6 +609,17 @@ Return this exact JSON structure:
 
                 st.success(f'{text["success"]}{p_name}')
 
+                if url_context["ok"]:
+                    with st.expander(text["url_insights"], expanded=False):
+                        if url_context["title"]:
+                            st.markdown(f"**{text['page_title_label']}:** {url_context['title']}")
+                        if url_context["description"]:
+                            st.markdown(f"**{text['page_desc_label']}:** {url_context['description']}")
+
+                        if extracted_keywords:
+                            st.markdown(f"**{text['extracted_keywords']}:**")
+                            st.markdown("".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords]), unsafe_allow_html=True)
+
                 plan_text = build_download_text(res, text, p_name)
                 st.download_button(
                     label=text["download"],
@@ -470,14 +628,15 @@ Return this exact JSON structure:
                     mime="text/plain"
                 )
 
-                col_a, col_b = st.columns(2)
+                tab1, tab2, tab3, tab4 = st.tabs([
+                    text["seo_tab"],
+                    text["ads_tab"],
+                    text["ideas_tab"],
+                    text["raw_tab"]
+                ])
 
-                with col_a:
-                    st.subheader(text["seo"])
-
+                with tab1:
                     st.markdown(f"**{text['primary_keywords']}**")
-                    st.code("\n".join(res["primary_keywords"]), language=None)
-                    st.caption(text["copy"])
                     st.code("\n".join(res["primary_keywords"]), language=None)
 
                     st.markdown(f"**{text['supporting_keywords']}**")
@@ -489,24 +648,32 @@ Return this exact JSON structure:
                     st.markdown(f"**{text['meta_description']}**")
                     st.code(res["meta_description"], language=None)
 
-                    st.subheader(text["slogans"])
-                    st.code("\n".join(res["slogans"]), language=None)
+                with tab2:
+                    col_a, col_b = st.columns(2)
 
-                    st.subheader(text["ctas"])
-                    st.code("\n".join(res["ctas"]), language=None)
+                    with col_a:
+                        st.subheader(text["slogans"])
+                        st.code("\n".join(res["slogans"]), language=None)
 
-                with col_b:
-                    st.subheader(text["short_headlines"])
-                    st.code("\n".join(res["short_headlines"]), language=None)
+                        st.subheader(text["ctas"])
+                        st.code("\n".join(res["ctas"]), language=None)
 
-                    st.subheader(text["long_headlines"])
-                    st.code("\n".join(res["long_headlines"]), language=None)
+                    with col_b:
+                        st.subheader(text["short_headlines"])
+                        st.code("\n".join(res["short_headlines"]), language=None)
 
-                st.subheader(text["descriptions"])
-                st.code("\n".join(res["descriptions"]), language=None)
+                        st.subheader(text["long_headlines"])
+                        st.code("\n".join(res["long_headlines"]), language=None)
 
-                st.subheader(text["ideas"])
-                st.code("\n".join(res["content_ideas"]), language=None)
+                    st.subheader(text["descriptions"])
+                    st.code("\n".join(res["descriptions"]), language=None)
+
+                with tab3:
+                    st.subheader(text["ideas"])
+                    st.code("\n".join(res["content_ideas"]), language=None)
+
+                with tab4:
+                    st.json(res)
 
             except Exception as e:
                 st.error(f"حدث خطأ: {e}" if lang == "العربية" else f"Error: {e}")
