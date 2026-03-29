@@ -12,7 +12,6 @@ st.set_page_config(layout="wide", page_title="Professional Content Builder")
 st.markdown(
     """
 <style>
-/* ===== App background ===== */
 html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
     background: linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%) !important;
     color: #ffffff !important;
@@ -28,23 +27,20 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
     padding-bottom: 2rem;
 }
 
-/* ===== Typography ===== */
 h1, h2, h3, h4, h5, h6 {
     color: #ffffff !important;
     font-weight: 800 !important;
 }
 
 p, span, div {
-    color: #e5e7eb;
+    color: #e5e7eb !important;
 }
 
-/* ===== Labels ===== */
 label, .stTextInput label, .stSelectbox label, .stTextArea label {
     color: #f8fafc !important;
     font-weight: 700 !important;
 }
 
-/* ===== Inputs ===== */
 .stTextInput input,
 .stTextArea textarea {
     background: #ffffff !important;
@@ -55,7 +51,6 @@ label, .stTextInput label, .stSelectbox label, .stTextArea label {
     font-weight: 600 !important;
 }
 
-/* ===== Select main closed box ===== */
 .stSelectbox div[data-baseweb="select"] > div,
 .stSelectbox div[data-baseweb="select"] span,
 .stSelectbox div[data-baseweb="select"] input,
@@ -67,7 +62,6 @@ label, .stTextInput label, .stSelectbox label, .stTextArea label {
     font-weight: 700 !important;
 }
 
-/* ===== Dropdown menu options ===== */
 [data-baseweb="menu"],
 [data-baseweb="popover"] {
     background: #ffffff !important;
@@ -82,21 +76,18 @@ div[role="listbox"] * {
     font-weight: 600 !important;
 }
 
-/* Hover/selected option */
 li[role="option"]:hover,
 li[aria-selected="true"] {
     background: #dbeafe !important;
     color: #0f172a !important;
 }
 
-/* Placeholder */
 input::placeholder,
 textarea::placeholder {
     color: #64748b !important;
     opacity: 1 !important;
 }
 
-/* ===== Buttons ===== */
 .stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #7c3aed, #2563eb) !important;
@@ -118,7 +109,6 @@ textarea::placeholder {
     font-weight: 700 !important;
 }
 
-/* ===== Cards ===== */
 .metric-card {
     background: #0b1730 !important;
     border: 1px solid #334155 !important;
@@ -146,14 +136,13 @@ textarea::placeholder {
     display: inline-block;
     padding: 8px 12px;
     border-radius: 999px;
-    background: #1d4ed8;
-    border: 1px solid #60a5fa;
+    background: #1d4ed8 !important;
+    border: 1px solid #60a5fa !important;
     margin: 4px 6px 4px 0;
     color: white !important;
     font-size: 0.92rem;
 }
 
-/* ===== Tabs ===== */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
 }
@@ -171,21 +160,32 @@ textarea::placeholder {
     color: white !important;
 }
 
-/* ===== Expander ===== */
 [data-testid="stExpander"] details {
     background: #0f172a !important;
     border: 1px solid #334155 !important;
     border-radius: 12px !important;
 }
 
-/* ===== Alerts ===== */
 .stAlert {
     border-radius: 12px !important;
 }
 
-/* ===== Code blocks ===== */
-pre, code, [data-testid="stCodeBlock"] {
-    border-radius: 12px !important;
+[data-testid="stCodeBlock"] {
+    background: #0b1730 !important;
+    border: 1px solid #334155 !important;
+    border-radius: 14px !important;
+}
+
+[data-testid="stCodeBlock"] pre,
+[data-testid="stCodeBlock"] code,
+.stCode, .stCodeBlock, pre, code {
+    background: #0b1730 !important;
+    color: #f8fafc !important;
+    border-radius: 14px !important;
+}
+
+[data-testid="stCodeBlock"] button {
+    color: white !important;
 }
 </style>
 """,
@@ -247,6 +247,11 @@ def ui_text(lang: str) -> dict:
             "url_insights": "🔍 تحليل الرابط",
             "page_title_label": "عنوان الصفحة",
             "page_desc_label": "وصف الصفحة",
+            "meta_keywords_label": "Meta Keywords",
+            "headings_label": "العناوين",
+            "link_texts_label": "نصوص الروابط",
+            "list_items_label": "القوائم",
+            "alt_texts_label": "Alt Text",
             "extracted_keywords": "الكلمات المستخرجة من الرابط",
             "download": "تحميل الخطة",
             "download_file": "marketing_plan.txt",
@@ -291,6 +296,11 @@ def ui_text(lang: str) -> dict:
         "url_insights": "🔍 URL Analysis",
         "page_title_label": "Page Title",
         "page_desc_label": "Page Description",
+        "meta_keywords_label": "Meta Keywords",
+        "headings_label": "Headings",
+        "link_texts_label": "Link Texts",
+        "list_items_label": "List Items",
+        "alt_texts_label": "Image Alt Texts",
         "extracted_keywords": "Keywords Extracted From URL",
         "download": "Download Plan",
         "download_file": "marketing_plan.txt",
@@ -322,14 +332,33 @@ def normalize_url(url: str) -> str:
     return url
 
 
+def clean_text(value: str) -> str:
+    return " ".join(value.split()).strip()
+
+
+def unique_keep_order(items):
+    seen = set()
+    result = []
+    for item in items:
+        key = item.lower().strip()
+        if item and key not in seen:
+            seen.add(key)
+            result.append(item.strip())
+    return result
+
+
 def fetch_url_context(url: str) -> dict:
     result = {
         "ok": False,
         "final_url": "",
         "title": "",
         "description": "",
+        "meta_keywords": [],
         "content": "",
         "headings": [],
+        "link_texts": [],
+        "list_items": [],
+        "alt_texts": [],
         "error": "",
     }
 
@@ -339,7 +368,7 @@ def fetch_url_context(url: str) -> dict:
     try:
         response = requests.get(
             url,
-            timeout=10,
+            timeout=12,
             headers={"User-Agent": "Mozilla/5.0"},
             allow_redirects=True,
         )
@@ -349,25 +378,59 @@ def fetch_url_context(url: str) -> dict:
 
         title = ""
         if soup.title and soup.title.string:
-            title = soup.title.string.strip()
+            title = clean_text(soup.title.string)
 
         meta_desc = ""
         meta = soup.find("meta", attrs={"name": "description"})
         if meta and meta.get("content"):
-            meta_desc = meta["content"].strip()
+            meta_desc = clean_text(meta["content"])
+
+        meta_keywords = []
+        meta_kw = soup.find("meta", attrs={"name": "keywords"})
+        if meta_kw and meta_kw.get("content"):
+            meta_keywords = [clean_text(x) for x in meta_kw["content"].split(",") if clean_text(x)]
 
         headings = []
         for tag_name in ["h1", "h2", "h3"]:
             for tag in soup.find_all(tag_name):
-                txt = " ".join(tag.get_text(separator=" ").split()).strip()
+                txt = clean_text(tag.get_text(separator=" "))
                 if txt:
                     headings.append(txt)
+
+        link_texts = []
+        for a in soup.find_all("a"):
+            txt = clean_text(a.get_text(separator=" "))
+            if txt and len(txt) <= 120:
+                link_texts.append(txt)
+
+        list_items = []
+        for li in soup.find_all("li"):
+            txt = clean_text(li.get_text(separator=" "))
+            if txt and 2 <= len(txt.split()) <= 20:
+                list_items.append(txt)
+
+        alt_texts = []
+        for img in soup.find_all("img"):
+            alt = clean_text(img.get("alt", ""))
+            if alt:
+                alt_texts.append(alt)
+
+        content_blocks = []
+        selectors = [
+            "article", "section", "main", ".card", ".post", ".book", ".title",
+            ".category", ".content", ".entry", ".product", ".item"
+        ]
+        for selector in selectors:
+            for tag in soup.select(selector):
+                txt = clean_text(tag.get_text(separator=" "))
+                if txt and len(txt) > 20:
+                    content_blocks.append(txt)
 
         for tag in soup(["script", "style", "noscript"]):
             tag.decompose()
 
-        visible_text = " ".join(soup.get_text(separator=" ").split())
-        visible_text = visible_text[:3000]
+        visible_text = clean_text(soup.get_text(separator=" "))
+        visible_text = visible_text[:5000]
 
         result.update(
             {
@@ -375,8 +438,13 @@ def fetch_url_context(url: str) -> dict:
                 "final_url": response.url,
                 "title": title,
                 "description": meta_desc,
+                "meta_keywords": unique_keep_order(meta_keywords)[:50],
                 "content": visible_text,
-                "headings": headings[:10],
+                "headings": unique_keep_order(headings)[:40],
+                "link_texts": unique_keep_order(link_texts)[:80],
+                "list_items": unique_keep_order(list_items)[:80],
+                "alt_texts": unique_keep_order(alt_texts)[:40],
+                "content_blocks": unique_keep_order(content_blocks)[:40],
             }
         )
         return result
@@ -389,13 +457,13 @@ def fetch_url_context(url: str) -> dict:
 AR_STOPWORDS = {
     "في", "من", "على", "إلى", "عن", "مع", "هذا", "هذه", "ذلك", "تلك", "هو", "هي",
     "كما", "تم", "او", "أو", "و", "يا", "ما", "لا", "لم", "لن", "كل", "أي", "أن",
-    "إن", "الى", "the", "and",
+    "إن", "الى", "the", "and", "على", "فيه", "لها", "له", "فيها", "عند", "بعد",
 }
 
 EN_STOPWORDS = {
     "the", "and", "for", "with", "that", "this", "from", "your", "you", "into",
     "are", "our", "was", "were", "will", "have", "has", "had", "about", "more",
-    "than", "their", "they", "them", "www", "com", "https", "http",
+    "than", "their", "they", "them", "www", "com", "https", "http", "home",
 }
 
 
@@ -412,15 +480,30 @@ def extract_keywords_from_url_context(url_context: dict, lang: str) -> list[str]
     weighted_text_parts = []
 
     if url_context["title"]:
-        weighted_text_parts.extend([url_context["title"]] * 4)
+        weighted_text_parts.extend([url_context["title"]] * 6)
 
     if url_context["description"]:
-        weighted_text_parts.extend([url_context["description"]] * 3)
+        weighted_text_parts.extend([url_context["description"]] * 5)
+
+    for kw in url_context.get("meta_keywords", []):
+        weighted_text_parts.extend([kw] * 6)
 
     for h in url_context.get("headings", []):
-        weighted_text_parts.extend([h] * 3)
+        weighted_text_parts.extend([h] * 5)
 
-    if url_context["content"]:
+    for x in url_context.get("link_texts", [])[:50]:
+        weighted_text_parts.extend([x] * 3)
+
+    for x in url_context.get("list_items", [])[:50]:
+        weighted_text_parts.extend([x] * 4)
+
+    for x in url_context.get("alt_texts", [])[:30]:
+        weighted_text_parts.extend([x] * 2)
+
+    for x in url_context.get("content_blocks", [])[:30]:
+        weighted_text_parts.extend([x] * 3)
+
+    if url_context.get("content"):
         weighted_text_parts.append(url_context["content"])
 
     combined = " ".join(weighted_text_parts)
@@ -430,30 +513,42 @@ def extract_keywords_from_url_context(url_context: dict, lang: str) -> list[str]
 
     counts = Counter(tokens)
     bigrams = Counter()
+    trigrams = Counter()
 
     for part in weighted_text_parts:
         part_tokens = tokenize_text(part, lang)
+
         for i in range(len(part_tokens) - 1):
             bg = f"{part_tokens[i]} {part_tokens[i + 1]}"
             if len(bg) > 5:
                 bigrams[bg] += 1
 
+        for i in range(len(part_tokens) - 2):
+            tg = f"{part_tokens[i]} {part_tokens[i + 1]} {part_tokens[i + 2]}"
+            if len(tg) > 8:
+                trigrams[tg] += 1
+
     candidates = []
-    for word, count in counts.most_common(40):
+
+    for word, count in counts.most_common(80):
         candidates.append((word, count))
-    for phrase, count in bigrams.most_common(40):
-        candidates.append((phrase, count + 2))
+
+    for phrase, count in bigrams.most_common(80):
+        candidates.append((phrase, count + 3))
+
+    for phrase, count in trigrams.most_common(60):
+        candidates.append((phrase, count + 5))
 
     ranked = sorted(candidates, key=lambda x: x[1], reverse=True)
 
     final_keywords = []
     seen = set()
     for kw, _ in ranked:
-        key = kw.lower()
+        key = kw.lower().strip()
         if key not in seen:
             seen.add(key)
             final_keywords.append(kw)
-        if len(final_keywords) >= 20:
+        if len(final_keywords) >= 40:
             break
 
     return final_keywords
@@ -584,7 +679,7 @@ with st.container():
             )
 
         st.markdown("### URL & AI Preview")
-        st.write("Paste a page URL and the app will try to extract title, description, headings, and on-page keyword signals automatically.")
+        st.write("Paste a page URL and the app will try to extract titles, categories, link texts, list items, and on-page keyword signals automatically.")
 
 
 if generate:
@@ -598,8 +693,13 @@ if generate:
             "ok": False,
             "title": "",
             "description": "",
+            "meta_keywords": [],
             "content": "",
             "headings": [],
+            "link_texts": [],
+            "list_items": [],
+            "alt_texts": [],
+            "content_blocks": [],
             "final_url": "",
             "error": "",
         }
@@ -633,7 +733,11 @@ Website URL checked successfully.
 Final URL: {url_context["final_url"]}
 Page Title: {url_context["title"]}
 Meta Description: {url_context["description"]}
-Headings: {", ".join(url_context["headings"])}
+Meta Keywords: {", ".join(url_context["meta_keywords"])}
+Headings: {", ".join(url_context["headings"][:30])}
+Link Texts: {", ".join(url_context["link_texts"][:40])}
+List Items: {", ".join(url_context["list_items"][:40])}
+Image Alt Texts: {", ".join(url_context["alt_texts"][:30])}
 Visible Page Content:
 {url_context["content"]}
 
@@ -665,14 +769,14 @@ Requirements:
 - Make the output feel relevant to the target country.
 - If the selected language is Arabic, adapt the wording style to the selected country.
 - The entire output must be in the selected language.
-- If website context is available, use it to improve relevance and accuracy.
-- Use the automatically extracted keywords from the URL when helpful.
+- If website context is available, use it strongly.
+- Use categories, titles, item names, and repeated concepts found on the page.
+- Make the output realistic and useful for SEO and campaigns.
 - Make the meta title clickable, natural, and SEO-friendly.
 - Make the meta description concise and compelling.
 - Separate primary keywords from supporting keywords clearly.
 - Make short headlines suitable for ads.
 - Make long headlines more descriptive and conversion-focused.
-- Keep the output marketing-focused, realistic, and usable.
 - Avoid generic filler.
 - Return ONLY valid JSON.
 
@@ -709,10 +813,25 @@ Return this exact JSON structure:
                             st.markdown(f"**{text['page_title_label']}:** {url_context['title']}")
                         if url_context["description"]:
                             st.markdown(f"**{text['page_desc_label']}:** {url_context['description']}")
+                        if url_context["meta_keywords"]:
+                            st.markdown(f"**{text['meta_keywords_label']}:**")
+                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["meta_keywords"][:20]]), unsafe_allow_html=True)
+                        if url_context["headings"]:
+                            st.markdown(f"**{text['headings_label']}:**")
+                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["headings"][:20]]), unsafe_allow_html=True)
+                        if url_context["link_texts"]:
+                            st.markdown(f"**{text['link_texts_label']}:**")
+                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["link_texts"][:20]]), unsafe_allow_html=True)
+                        if url_context["list_items"]:
+                            st.markdown(f"**{text['list_items_label']}:**")
+                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["list_items"][:20]]), unsafe_allow_html=True)
+                        if url_context["alt_texts"]:
+                            st.markdown(f"**{text['alt_texts_label']}:**")
+                            st.markdown("".join([f'<span class="pill">{x}</span>' for x in url_context["alt_texts"][:20]]), unsafe_allow_html=True)
                         if extracted_keywords:
                             st.markdown(f"**{text['extracted_keywords']}:**")
                             st.markdown(
-                                "".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords]),
+                                "".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords[:30]]),
                                 unsafe_allow_html=True,
                             )
 
