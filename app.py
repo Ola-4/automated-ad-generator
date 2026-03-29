@@ -52,23 +52,44 @@ label, .stTextInput label, .stSelectbox label, .stTextArea label {
     border-radius: 12px !important;
     border: 1px solid #334155 !important;
     box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    font-weight: 500 !important;
+    font-weight: 600 !important;
 }
 
-.stSelectbox div[data-baseweb="select"] > div {
+/* ===== Select main closed box ===== */
+.stSelectbox div[data-baseweb="select"] > div,
+.stSelectbox div[data-baseweb="select"] span,
+.stSelectbox div[data-baseweb="select"] input,
+.stSelectbox div[data-baseweb="select"] svg {
     background: #ffffff !important;
     color: #0f172a !important;
+    fill: #0f172a !important;
     border-radius: 12px !important;
-    border: 1px solid #334155 !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    font-weight: 500 !important;
+    font-weight: 700 !important;
+}
+
+/* ===== Dropdown menu options ===== */
+[data-baseweb="menu"],
+[data-baseweb="popover"] {
+    background: #ffffff !important;
 }
 
 [data-baseweb="menu"] *,
-[data-baseweb="popover"] * {
+[data-baseweb="popover"] *,
+li[role="option"],
+div[role="listbox"] * {
+    color: #0f172a !important;
+    background: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Hover/selected option */
+li[role="option"]:hover,
+li[aria-selected="true"] {
+    background: #dbeafe !important;
     color: #0f172a !important;
 }
 
+/* Placeholder */
 input::placeholder,
 textarea::placeholder {
     color: #64748b !important;
@@ -418,9 +439,9 @@ def extract_keywords_from_url_context(url_context: dict, lang: str) -> list[str]
                 bigrams[bg] += 1
 
     candidates = []
-    for word, count in counts.most_common(20):
+    for word, count in counts.most_common(40):
         candidates.append((word, count))
-    for phrase, count in bigrams.most_common(20):
+    for phrase, count in bigrams.most_common(40):
         candidates.append((phrase, count + 2))
 
     ranked = sorted(candidates, key=lambda x: x[1], reverse=True)
@@ -428,10 +449,11 @@ def extract_keywords_from_url_context(url_context: dict, lang: str) -> list[str]
     final_keywords = []
     seen = set()
     for kw, _ in ranked:
-        if kw not in seen:
-            seen.add(kw)
+        key = kw.lower()
+        if key not in seen:
+            seen.add(key)
             final_keywords.append(kw)
-        if len(final_keywords) >= 12:
+        if len(final_keywords) >= 20:
             break
 
     return final_keywords
@@ -562,9 +584,7 @@ with st.container():
             )
 
         st.markdown("### URL & AI Preview")
-        st.write(
-            "Paste a page URL and the app will try to extract title, description, headings, and on-page keyword signals automatically."
-        )
+        st.write("Paste a page URL and the app will try to extract title, description, headings, and on-page keyword signals automatically.")
 
 
 if generate:
@@ -601,9 +621,10 @@ if generate:
         merged_keywords = []
         seen_keywords = set()
         for kw in extracted_keywords + extra_keywords_list:
-            if kw and kw.lower() not in seen_keywords:
+            key = kw.lower()
+            if kw and key not in seen_keywords:
                 merged_keywords.append(kw)
-                seen_keywords.add(kw.lower())
+                seen_keywords.add(key)
 
         url_instruction = ""
         if url_context["ok"]:
@@ -657,16 +678,16 @@ Requirements:
 
 Return this exact JSON structure:
 {{
-  "primary_keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"],
-  "supporting_keywords": ["support 1", "support 2", "support 3", "support 4", "support 5"],
+  "primary_keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5", "keyword 6", "keyword 7", "keyword 8", "keyword 9", "keyword 10"],
+  "supporting_keywords": ["support 1", "support 2", "support 3", "support 4", "support 5", "support 6", "support 7", "support 8", "support 9", "support 10"],
   "meta_title": "meta title here",
   "meta_description": "meta description here",
-  "slogans": ["slogan 1", "slogan 2", "slogan 3"],
-  "short_headlines": ["short 1", "short 2", "short 3", "short 4", "short 5"],
-  "long_headlines": ["long 1", "long 2", "long 3", "long 4", "long 5"],
-  "descriptions": ["description 1", "description 2", "description 3"],
-  "ctas": ["cta 1", "cta 2", "cta 3", "cta 4"],
-  "content_ideas": ["idea 1", "idea 2", "idea 3", "idea 4", "idea 5"]
+  "slogans": ["slogan 1", "slogan 2", "slogan 3", "slogan 4", "slogan 5", "slogan 6", "slogan 7", "slogan 8", "slogan 9", "slogan 10"],
+  "short_headlines": ["short 1", "short 2", "short 3", "short 4", "short 5", "short 6", "short 7", "short 8", "short 9", "short 10"],
+  "long_headlines": ["long 1", "long 2", "long 3", "long 4", "long 5", "long 6", "long 7", "long 8", "long 9", "long 10"],
+  "descriptions": ["description 1", "description 2", "description 3", "description 4", "description 5", "description 6", "description 7", "description 8", "description 9", "description 10"],
+  "ctas": ["cta 1", "cta 2", "cta 3", "cta 4", "cta 5", "cta 6", "cta 7", "cta 8", "cta 9", "cta 10"],
+  "content_ideas": ["idea 1", "idea 2", "idea 3", "idea 4", "idea 5", "idea 6", "idea 7", "idea 8", "idea 9", "idea 10"]
 }}
 """
 
