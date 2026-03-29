@@ -1,5 +1,8 @@
 import json
+import re
 import streamlit as st
+import requests
+from bs4 import BeautifulSoup
 from google import genai
 
 st.set_page_config(layout="wide", page_title="Professional Content Builder")
@@ -7,39 +10,53 @@ st.set_page_config(layout="wide", page_title="Professional Content Builder")
 st.markdown("""
 <style>
 .main {
-    background-color: #0f172a;
+    background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.22), transparent 30%),
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.18), transparent 28%),
+        linear-gradient(135deg, #0f172a, #111827, #1e293b);
 }
 
 html, body, [class*="css"] {
     color: #f8fafc;
 }
 
-label, .stTextInput label, .stSelectbox label, .stTextArea label {
-    color: #e2e8f0 !important;
-    font-weight: 600 !important;
+/* Section title feel */
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
+/* Labels */
+label, .stTextInput label, .stSelectbox label, .stTextArea label {
+    color: #e2e8f0 !important;
+    font-weight: 700 !important;
+}
+
+/* Inputs */
 .stTextInput input,
 .stTextArea textarea {
     background-color: #ffffff !important;
     color: #0f172a !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     border: 1px solid #cbd5e1 !important;
 }
 
+/* Select boxes */
 .stSelectbox div[data-baseweb="select"] > div {
     background-color: #ffffff !important;
     color: #0f172a !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     border: 1px solid #cbd5e1 !important;
 }
 
+/* Placeholder */
 input::placeholder,
 textarea::placeholder {
     color: #64748b !important;
     opacity: 1 !important;
 }
 
+/* Button */
 .stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #7c3aed, #06b6d4);
@@ -47,28 +64,37 @@ textarea::placeholder {
     border: none;
     padding: 12px;
     font-weight: bold;
-    border-radius: 10px;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.25);
 }
 
+/* Cards */
 .info-card {
-    background: #1e293b;
+    background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
     color: #f8fafc;
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 14px;
     border-left: 4px solid #06b6d4;
     margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .small-card {
-    background: #1e293b;
+    background: linear-gradient(135deg, rgba(51,65,85,0.95), rgba(30,41,59,0.95));
     color: #f8fafc;
     padding: 12px;
-    border-radius: 10px;
+    border-radius: 12px;
     margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Accent headers */
+h1, h2, h3 {
+    color: #f8fafc !important;
 }
 
 .stAlert {
-    border-radius: 10px;
+    border-radius: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -100,8 +126,7 @@ def get_country_tone(country: str, lang: str) -> str:
         if country == "Sudan":
             return "Write in Arabic with a Sudan-friendly marketing tone. Keep it warm, simple, and relatable."
         return "Write in clear modern Arabic with a strong marketing tone."
-    else:
-        return "Write in polished marketing English adapted to the target country and audience."
+    return "Write in polished marketing English adapted to the target country and audience."
 
 
 def ui_text(lang: str) -> dict:
@@ -114,11 +139,11 @@ def ui_text(lang: str) -> dict:
             "industry_label": "مجال العمل",
             "country_label": "الدولة المستهدفة",
             "language_label": "اللغة",
-            "audience_label": "تفاصيل الجمهور المستهدف (Target Audience)",
+            "audience_label": "تفاصيل الجمهور المستهدف",
             "audience_placeholder": "مثلاً: الشباب المهتمين بالثقافة، أو أصحاب الشركات الناشئة...",
-            "seed_label": "الكلمات المفتاحية الأساسية (Seed Keywords)",
+            "seed_label": "الكلمات المفتاحية الأساسية",
             "seed_placeholder": "مثلاً: بودكاست, قصص, محتوى صوتي, ثقافة, إلهام",
-            "url_label": "رابط الموقع أو الصفحة (اختياري)",
+            "url_label": "رابط الموقع أو الصفحة",
             "url_placeholder": "مثلاً: https://example.com",
             "button": "توليد الخطة التسويقية ✨",
             "warning_project": "الرجاء إدخال اسم المشروع للمتابعة.",
@@ -131,10 +156,13 @@ def ui_text(lang: str) -> dict:
             "descriptions": "📝 الوصف التسويقي",
             "ctas": "🚀 الدعوات لاتخاذ إجراء",
             "ideas": "💡 أفكار المحتوى",
+            "url_ok": "تم التحقق من الرابط واستخدام محتواه لتحسين النتائج.",
+            "url_bad": "تعذر قراءة الرابط. سيتم التوليد بدون محتوى الصفحة.",
+            "url_invalid": "الرابط غير صالح. سيتم تجاهله."
         }
     return {
         "page_title": "🚀 Smart Content Builder",
-        "subtitle": "A professional tool to generate SEO plans, slogans, headlines, and marketing ideas.",
+        "subtitle": "A professional tool to generate SEO plans, slogans, headlines, descriptions, and marketing ideas.",
         "project_label": "Project / Brand Name",
         "project_placeholder": "Enter your project name...",
         "industry_label": "Industry",
@@ -144,7 +172,7 @@ def ui_text(lang: str) -> dict:
         "audience_placeholder": "For example: culture-loving youth, startup founders, busy professionals...",
         "seed_label": "Seed Keywords",
         "seed_placeholder": "For example: podcast, stories, audio content, culture, inspiration",
-        "url_label": "Website or Page URL (optional)",
+        "url_label": "Website or Page URL",
         "url_placeholder": "For example: https://example.com",
         "button": "Generate Marketing Plan ✨",
         "warning_project": "Please enter the project name to continue.",
@@ -157,10 +185,88 @@ def ui_text(lang: str) -> dict:
         "descriptions": "📝 Descriptions",
         "ctas": "🚀 CTA Suggestions",
         "ideas": "💡 Content Ideas",
+        "url_ok": "URL was checked and page content was used to improve results.",
+        "url_bad": "Could not read the URL. Results were generated without page content.",
+        "url_invalid": "Invalid URL. It was ignored."
     }
 
 
-# language selector first so whole UI follows it
+def normalize_url(url: str) -> str:
+    url = url.strip()
+    if not url:
+        return ""
+    if not re.match(r"^https?://", url):
+        url = "https://" + url
+    return url
+
+
+def fetch_url_context(url: str) -> dict:
+    """
+    Tries to fetch the URL and extract useful visible context.
+    Returns:
+      {
+        "ok": bool,
+        "final_url": str,
+        "title": str,
+        "description": str,
+        "content": str,
+        "error": str
+      }
+    """
+    result = {
+        "ok": False,
+        "final_url": "",
+        "title": "",
+        "description": "",
+        "content": "",
+        "error": ""
+    }
+
+    if not url:
+        return result
+
+    try:
+        response = requests.get(
+            url,
+            timeout=10,
+            headers={
+                "User-Agent": "Mozilla/5.0"
+            },
+            allow_redirects=True
+        )
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        title = ""
+        if soup.title and soup.title.string:
+            title = soup.title.string.strip()
+
+        meta_desc = ""
+        meta = soup.find("meta", attrs={"name": "description"})
+        if meta and meta.get("content"):
+            meta_desc = meta["content"].strip()
+
+        for tag in soup(["script", "style", "noscript"]):
+            tag.decompose()
+
+        text = " ".join(soup.get_text(separator=" ").split())
+        text = text[:2500]
+
+        result.update({
+            "ok": True,
+            "final_url": response.url,
+            "title": title,
+            "description": meta_desc,
+            "content": text
+        })
+        return result
+
+    except Exception as e:
+        result["error"] = str(e)
+        return result
+
+
 top_col1, top_col2 = st.columns([1, 3])
 with top_col1:
     lang = st.selectbox("Language / اللغة", ["العربية", "English"])
@@ -240,15 +346,29 @@ if generate:
     else:
         tone_instruction = get_country_tone(target_country, lang)
 
-        url_instruction = ""
-        if website_url.strip():
-            url_instruction = f"""
-Website URL:
-{website_url}
+        cleaned_url = normalize_url(website_url)
+        url_context = {"ok": False, "title": "", "description": "", "content": "", "final_url": "", "error": ""}
 
-Use the URL as context for the business/page positioning.
-If the exact page content cannot be fetched directly, infer from the URL and project description carefully.
-Reflect the likely business offering in the output without inventing unrealistic details.
+        if website_url.strip():
+            if cleaned_url.startswith("http://") or cleaned_url.startswith("https://"):
+                url_context = fetch_url_context(cleaned_url)
+                if url_context["ok"]:
+                    st.success(text["url_ok"])
+                else:
+                    st.warning(text["url_bad"])
+            else:
+                st.warning(text["url_invalid"])
+
+        url_instruction = ""
+        if url_context["ok"]:
+            url_instruction = f"""
+Website URL checked successfully.
+Final URL: {url_context["final_url"]}
+Page Title: {url_context["title"]}
+Meta Description: {url_context["description"]}
+Visible Page Content:
+{url_context["content"]}
+Use this page context strongly to improve the accuracy of the output.
 """
 
         prompt = f"""
@@ -271,7 +391,7 @@ Requirements:
 - If the selected language is Arabic, adapt the wording style to the selected country.
 - The entire output must be in the selected language.
 - Use the seed keywords naturally.
-- If a website URL is provided, use it to improve relevance and context.
+- If website context is available, use it to improve relevance and accuracy.
 - Keep the output marketing-focused, realistic, and usable.
 - Avoid generic filler.
 - Return ONLY valid JSON.
