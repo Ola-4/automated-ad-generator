@@ -11,11 +11,13 @@ st.set_page_config(layout="wide", page_title="Professional Content Builder")
 
 st.markdown("""
 <style>
+/* ===== Background ===== */
 .main {
     background:
-        radial-gradient(circle at top left, rgba(124, 58, 237, 0.22), transparent 30%),
-        radial-gradient(circle at top right, rgba(6, 182, 212, 0.18), transparent 28%),
-        linear-gradient(135deg, #0f172a, #111827, #1e293b);
+        radial-gradient(circle at 8% 8%, rgba(124, 58, 237, 0.34), transparent 24%),
+        radial-gradient(circle at 92% 14%, rgba(6, 182, 212, 0.24), transparent 20%),
+        radial-gradient(circle at 50% 85%, rgba(236, 72, 153, 0.16), transparent 22%),
+        linear-gradient(135deg, #020617, #0f172a, #111827);
 }
 
 html, body, [class*="css"] {
@@ -23,28 +25,51 @@ html, body, [class*="css"] {
 }
 
 .block-container {
-    padding-top: 2rem;
+    max-width: 1240px;
+    padding-top: 1.8rem;
     padding-bottom: 2rem;
 }
 
+/* ===== Typography ===== */
+h1 {
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #ffffff, #c4b5fd, #67e8f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.25rem !important;
+}
+
+h2, h3 {
+    color: #f8fafc !important;
+}
+
+p {
+    color: #cbd5e1;
+}
+
+/* ===== Labels ===== */
 label, .stTextInput label, .stSelectbox label, .stTextArea label {
     color: #e2e8f0 !important;
     font-weight: 700 !important;
 }
 
+/* ===== Inputs ===== */
 .stTextInput input,
 .stTextArea textarea {
-    background-color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.98) !important;
     color: #0f172a !important;
-    border-radius: 12px !important;
+    border-radius: 14px !important;
     border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10);
 }
 
 .stSelectbox div[data-baseweb="select"] > div {
-    background-color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.98) !important;
     color: #0f172a !important;
-    border-radius: 12px !important;
+    border-radius: 14px !important;
     border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10);
 }
 
 input::placeholder,
@@ -53,63 +78,124 @@ textarea::placeholder {
     opacity: 1 !important;
 }
 
+/* ===== Buttons ===== */
 .stButton > button {
     width: 100%;
-    background: linear-gradient(90deg, #7c3aed, #06b6d4);
+    background: linear-gradient(90deg, #7c3aed, #06b6d4, #ec4899);
     color: white;
     border: none;
-    padding: 12px;
-    font-weight: bold;
-    border-radius: 12px;
-    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.25);
+    padding: 13px 16px;
+    font-weight: 800;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(124, 58, 237, 0.28);
+}
+
+.stDownloadButton > button {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.10);
+    padding: 12px 16px;
+    font-weight: 700;
+    border-radius: 14px;
+}
+
+/* ===== Cards ===== */
+.glass-card {
+    background: linear-gradient(135deg, rgba(15,23,42,0.72), rgba(30,41,59,0.68));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: 0 16px 34px rgba(0,0,0,0.18);
+    backdrop-filter: blur(10px);
+}
+
+.metric-card {
+    background: linear-gradient(135deg, rgba(124,58,237,0.16), rgba(6,182,212,0.10));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    min-height: 88px;
+}
+
+.metric-label {
+    color: #cbd5e1;
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+}
+
+.metric-value {
+    color: white;
+    font-weight: 800;
+    font-size: 1.15rem;
+    word-break: break-word;
 }
 
 .info-card {
-    background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
+    background: linear-gradient(135deg, rgba(30,41,59,0.96), rgba(15,23,42,0.96));
     color: #f8fafc;
     padding: 15px;
-    border-radius: 14px;
-    border-left: 4px solid #06b6d4;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    border-left: 5px solid #06b6d4;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.14);
 }
 
 .small-card {
-    background: linear-gradient(135deg, rgba(51,65,85,0.95), rgba(30,41,59,0.95));
+    background: linear-gradient(135deg, rgba(124,58,237,0.16), rgba(6,182,212,0.12));
     color: #f8fafc;
-    padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    border: 1px solid rgba(255,255,255,0.06);
+    padding: 12px 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.07);
 }
 
 .pill {
     display: inline-block;
     padding: 8px 12px;
     border-radius: 999px;
-    background: rgba(124, 58, 237, 0.18);
-    border: 1px solid rgba(124, 58, 237, 0.35);
+    background: linear-gradient(90deg, rgba(124,58,237,0.22), rgba(6,182,212,0.18));
+    border: 1px solid rgba(255,255,255,0.10);
     margin: 4px 6px 4px 0;
     color: #f8fafc;
     font-size: 0.92rem;
 }
 
+/* ===== Tabs ===== */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 8px;
+    gap: 10px;
 }
 
 .stTabs [data-baseweb="tab"] {
     background: rgba(255,255,255,0.06);
-    border-radius: 10px;
-    padding: 10px 16px;
+    border-radius: 12px;
+    padding: 10px 18px;
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .stTabs [aria-selected="true"] {
-    background: linear-gradient(90deg, rgba(124,58,237,0.25), rgba(6,182,212,0.20));
+    background: linear-gradient(90deg, rgba(124,58,237,0.34), rgba(6,182,212,0.22));
+    color: white !important;
 }
 
+/* ===== Code blocks ===== */
+pre, code {
+    border-radius: 14px !important;
+}
+
+/* ===== Alerts ===== */
 .stAlert {
-    border-radius: 12px;
+    border-radius: 14px;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+    .block-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -185,7 +271,9 @@ def ui_text(lang: str) -> dict:
             "seo_tab": "SEO",
             "ads_tab": "Ads",
             "ideas_tab": "Ideas",
-            "raw_tab": "Raw Output"
+            "project_metric": "المشروع",
+            "country_metric": "الدولة",
+            "industry_metric": "المجال"
         }
     return {
         "page_title": "🚀 Smart Content Builder",
@@ -227,7 +315,9 @@ def ui_text(lang: str) -> dict:
         "seo_tab": "SEO",
         "ads_tab": "Ads",
         "ideas_tab": "Ideas",
-        "raw_tab": "Raw Output"
+        "project_metric": "Project",
+        "country_metric": "Country",
+        "industry_metric": "Industry"
     }
 
 
@@ -345,8 +435,8 @@ def extract_keywords_from_url_context(url_context: dict, lang: str) -> list[str]
         return []
 
     counts = Counter(tokens)
-
     bigrams = Counter()
+
     for part in weighted_text_parts:
         part_tokens = tokenize_text(part, lang)
         for i in range(len(part_tokens) - 1):
@@ -431,67 +521,95 @@ st.title(text["page_title"])
 st.write(text["subtitle"])
 
 with st.container():
-    col1, col2 = st.columns(2)
+    left, right = st.columns([1.05, 0.95], gap="large")
 
-    with col1:
-        p_name = st.text_input(
-            text["project_label"],
-            placeholder=text["project_placeholder"]
-        )
+    with left:
+        with st.container():
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
 
-        industry_options_ar = [
-            "بودكاست",
-            "تقنية/SaaS",
-            "عقارات",
-            "طبخ/أغذية",
-            "تعليم",
-            "تجارة إلكترونية",
-            "صحة/عافية",
-            "جمال",
-            "رياضة",
-            "أخرى"
-        ]
+            p_name = st.text_input(
+                text["project_label"],
+                placeholder=text["project_placeholder"]
+            )
 
-        industry_options_en = [
-            "Podcast",
-            "Technology / SaaS",
-            "Real Estate",
-            "Food / Cooking",
-            "Education",
-            "E-commerce",
-            "Health / Wellness",
-            "Beauty",
-            "Sports",
-            "Other"
-        ]
+            industry_options_ar = [
+                "بودكاست",
+                "تقنية/SaaS",
+                "عقارات",
+                "طبخ/أغذية",
+                "تعليم",
+                "تجارة إلكترونية",
+                "صحة/عافية",
+                "جمال",
+                "رياضة",
+                "أخرى"
+            ]
 
-        industry = st.selectbox(
-            text["industry_label"],
-            industry_options_ar if lang == "العربية" else industry_options_en
-        )
+            industry_options_en = [
+                "Podcast",
+                "Technology / SaaS",
+                "Real Estate",
+                "Food / Cooking",
+                "Education",
+                "E-commerce",
+                "Health / Wellness",
+                "Beauty",
+                "Sports",
+                "Other"
+            ]
 
-    with col2:
-        target_country = st.selectbox(
-            text["country_label"],
-            ["Egypt", "Saudi Arabia", "UAE", "Sudan", "Global"]
-        )
+            industry = st.selectbox(
+                text["industry_label"],
+                industry_options_ar if lang == "العربية" else industry_options_en
+            )
 
-    audience = st.text_area(
-        text["audience_label"],
-        placeholder=text["audience_placeholder"]
-    )
+            target_country = st.selectbox(
+                text["country_label"],
+                ["Egypt", "Saudi Arabia", "UAE", "Sudan", "Global"]
+            )
 
-    website_url = st.text_input(
-        text["url_label"],
-        placeholder=text["url_placeholder"]
-    )
+            audience = st.text_area(
+                text["audience_label"],
+                placeholder=text["audience_placeholder"]
+            )
 
-    extra_keywords = st.text_area(
-        text["seed_label"],
-        placeholder=text["seed_placeholder"]
-    )
+            website_url = st.text_input(
+                text["url_label"],
+                placeholder=text["url_placeholder"]
+            )
 
-    generate = st.button(text["button"])
+            extra_keywords = st.text_area(
+                text["seed_label"],
+                placeholder=text["seed_placeholder"]
+            )
+
+            generate = st.button(text["button"])
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    with right:
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-label">{text["project_metric"]}</div><div class="metric-value">{p_name if "p_name" in locals() and p_name else "—"}</div></div>',
+                unsafe_allow_html=True
+            )
+        with c2:
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-label">{text["country_metric"]}</div><div class="metric-value">{target_country if "target_country" in locals() and target_country else "—"}</div></div>',
+                unsafe_allow_html=True
+            )
+        with c3:
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-label">{text["industry_metric"]}</div><div class="metric-value">{industry if "industry" in locals() and industry else "—"}</div></div>',
+                unsafe_allow_html=True
+            )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        st.markdown("### URL & AI Preview")
+        st.write("Paste a page URL and the app will try to extract title, description, headings, and on-page keyword signals automatically.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 if generate:
@@ -618,7 +736,10 @@ Return this exact JSON structure:
 
                         if extracted_keywords:
                             st.markdown(f"**{text['extracted_keywords']}:**")
-                            st.markdown("".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords]), unsafe_allow_html=True)
+                            st.markdown(
+                                "".join([f'<span class="pill">{kw}</span>' for kw in extracted_keywords]),
+                                unsafe_allow_html=True
+                            )
 
                 plan_text = build_download_text(res, text, p_name)
                 st.download_button(
@@ -628,7 +749,7 @@ Return this exact JSON structure:
                     mime="text/plain"
                 )
 
-                tab1, tab2, tab3, tab4 = st.tabs([
+                tab1, tab2, tab3 = st.tabs([
                     text["seo_tab"],
                     text["ads_tab"],
                     text["ideas_tab"],
@@ -670,7 +791,6 @@ Return this exact JSON structure:
                 with tab3:
                     st.subheader(text["ideas"])
                     st.code("\n".join(res["content_ideas"]), language=None)
-
 
             except Exception as e:
                 st.error(f"حدث خطأ: {e}" if lang == "العربية" else f"Error: {e}")
